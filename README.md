@@ -139,6 +139,7 @@ doi = {10.48550/arXiv.2410.04746}
 ## Authors
 
 - **Jiabo Wang**
+- **Fedrico Giorgio Pfahler
 - **Elmo Xuyun Huang**
 - **Pu Duan**
 - **Huaxiong Wang**
