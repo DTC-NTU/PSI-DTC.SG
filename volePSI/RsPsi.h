@@ -55,7 +55,6 @@ namespace volePSI
 
         std::vector<u64> mIntersection;
         void setMultType(oc::MultType type) { mRecver.setMultType(type); };
-        Proto run(span<block> inputs, Socket &chl);
     };
 
     // TKL added
@@ -102,7 +101,6 @@ namespace volePSI
         oc::AES mAEShash; // WJ: simple hash PSI.
         RsOprfSender mSender;
         void setMultType(oc::MultType type) { mSender.setMultType(type); };
-        task<> run(span<block> inputs, Socket &chl, Socket &ch2);
         task<> runSpHshPSI(span<block> inputs, Socket &ch1, Socket &ch2); // WJ: simple hash PSI.
 
         Proto runSpHshPsiOsn(Socket &chl, Socket &ch2, std::vector<block> &sendSet, std::vector<block> &payloadSet); // WJ : WJ: simple hash PSi with OSN
