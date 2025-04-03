@@ -18,13 +18,9 @@ task<> OSNReceiver::rand_ot_send(std::vector<std::array<osuCrypto::block, 2>> &s
 	auto baseRecv = std::vector<osuCrypto::block>{};
 	auto baseChoice = osuCrypto::BitVector{};
 	auto baseOTs = osuCrypto::DefaultBaseOT();
-	// sender = osuCrypto::IknpOtExtSender(),
 	auto sender = std::move(osuCrypto::IknpOtExtSender{});
 
-	// osuCrypto::PRNG prng1(_mm_set_epi32(4253233465, 334565, 0, 235));
-
 	baseRecv.resize(128);
-	// osuCrypto::DefaultBaseOT baseOTs;
 	baseChoice.resize(128);
 	baseChoice.randomize(prng1);
 
@@ -44,15 +40,8 @@ osuCrypto::SilentOtExtSender &OSNReceiver::getSilentOtExtSender(osuCrypto::u64 n
 
 task<> OSNReceiver::silent_ot_send(std::vector<std::array<osuCrypto::block, 2>> &sendMsg, Socket &chl)
 {
-	// std::cout << "\n Silent OT sender!! \n";
-
 	auto prng1 = osuCrypto::PRNG(_mm_set_epi32(4253233465, 334565, 0, 235));
 	auto numOTs = 0;
-	/* osuCrypto::PRNG prng1(_mm_set_epi32(4253233465, 334565, 0, 235)); */
-	/* osuCrypto::u64  */ numOTs = size;
-
-	/* osuCrypto::SilentOtExtSender sender;
-	sender.configure(numOTs); */
 	co_await (getSilentOtExtSender(numOTs).silentSend(sendMsg, prng1, chl));
 }
 
@@ -70,8 +59,7 @@ task<> OSNReceiver::gen_benes_client_osn(int values, Socket &chl, std::vector<st
 	N = int(ceil(log2(values)));
 	levels = 2 * N - 1;
 	switches = levels * (values / 2);
-	//	osuCrypto::PRNG prng(_mm_set_epi32(4253233465, 334565, 0, 235));
-	// ret_masks =std::vector<std::vector<block>> (values);
+
 	ret_masks.resize(values);
 	masks.resize(values);
 	for (int j = 0; j < values; j++)
@@ -127,8 +115,6 @@ task<> OSNReceiver::gen_benes_client_osn(int values, Socket &chl, std::vector<st
 	{
 		ret_masks[i].push_back(masks[i]);
 	}
-
-	// return ret_masks;
 }
 
 OSNReceiver::OSNReceiver(size_t size, int ot_type) : size(size), ot_type(ot_type)
@@ -146,9 +132,7 @@ task<> OSNReceiver::run_osn(oc::span<block> inputs, Socket &chl, std::vector<oc:
 	size_t values = size;
 	auto ret_masks = std::vector<std::vector<block>>{};
 	auto benes_input = std::vector<block>{};
-	// ret_masks =std::vector<std::vector<block>> (values);
 	co_await (gen_benes_client_osn(values, chl, ret_masks));
-	// std::vector<block> benes_input;
 
 	for (int i = 0; i < values; ++i)
 		ret_masks[i][0] = ret_masks[i][0] ^ inputs[i];
