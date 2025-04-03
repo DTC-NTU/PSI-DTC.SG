@@ -69,7 +69,7 @@ For example:
 
 ### Output Data Format
 
-The expected output file, `Outcleartext.csv`, will have the following format:
+The expected output file, `out_cleartext.csv`, will have the following format:
 
 - **Column 1**: Attribute from Alice (AttributeAlice)
 - **Column 2**: Attribute from Bob (AttributeBob)
@@ -86,7 +86,7 @@ A3, B3
 
 ### Expected Output
 
-After running the scripts for **Alice**, **Bob**, and the **Service Provider**, the output file `Outcleartext.csv` should contain the aligned records based on common IDs. Each row should show the corresponding attributes from Alice and Bob for the same ID.
+After running the scripts for **Alice**, **Bob**, and the **Service Provider**, the output file `out_cleartext.csv` should contain the aligned records based on common IDs. Each row should show the corresponding attributes from Alice and Bob for the same ID.
 
 ### Example of Expected Output
 
@@ -98,22 +98,27 @@ If the input CSV files for Alice and Bob are:
 1, A1
 2, A2
 3, A3
+4, A4
+5, A5
+6, A6
 ```
 
 **bob_data.csv**:
 
 ```
-1, B1
+0, B0
 2, B2
 3, B3
+6, B6
+7, B8
 ```
 
-The output file `Outcleartext.csv` should look like this:
+The output file `out_cleartext.csv` should look like this:
 
 ```
-A1, B1
 A2, B2
 A3, B3
+A6, B6
 ```
 
 ## DOI
