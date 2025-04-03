@@ -334,26 +334,16 @@ namespace volePSI
                 if (isServer)
                 {
                     ;
-                    // std::cout << "\nConnecting as "
-                    //           << "PSI helper & OSN sender"
-                    //           << " at address " << ip2 << " and  at address " << ip3 << std::flush;
                 }
                 else
                 {
-                    //                    std::cout << " Connecting as " << (isPSIServer ? "PSI Alice" : "PSI Bob") << " at address " << ip << std::flush;
                     if (isPSIServer)
                     {
                         std::cout << "\nAlice:" << std::endl;
-                        //                                  << " at address " << ip1 << std::flush;
-                        //                        std::cout << " Connecting as "
-                        //                                  << "OSN receiver to address " << ip2 << std::flush;
                     }
                     else
                     {
                         std::cout << "\nBob: " << std::endl;
-                        //                                  << " to address " << ip1 << std::flush;
-                        //                        std::cout << " Connecting as "
-                        //                                  << "OSN receiver to address " << ip3 << std::flush;
                     }
                 }
             }
@@ -363,9 +353,7 @@ namespace volePSI
 
             if (!isServer)
             {
-                // if (!quiet)
-                //     std::cout << "\nreading set.......\n"
-                //               << std::flush;
+
                 auto readBegin = timer.setTimePoint("");
                 std::cout << path << std::endl;
                 dataset = readSet(path, ft, debug, bHashIt);
@@ -375,9 +363,6 @@ namespace volePSI
                 auto readEnd = timer.setTimePoint("");
                 if (!quiet)
                     std::cout << "reading input file takes " << std::chrono::duration_cast<std::chrono::milliseconds>(readEnd - readBegin).count() << " ms" << std::endl;
-                //        << "Validating set sizes... "  << std::endl;
-                //    if (set.size() != cmd.getOr((r == Role::Sender) ? "senderSize" : "receiverSize", set.size()))
-                //        throw std::runtime_error("File does not contain the specified set size.");
             }
             coproto::Socket chl;
             coproto::Socket ch2;
@@ -417,12 +402,6 @@ namespace volePSI
                 macoro::sync_wait(sender.runSpHshPsiOsn(chl, ch3, set, (withPayload ? dataset[1] : set)));
 
                 auto protoEnd = timer.setTimePoint("PSI+OSN end");
-                //                if (!quiet)
-                //                {
-                //                    std::cout << "Bob : protocol takes " << std::chrono::duration_cast<std::chrono::milliseconds>(protoEnd - protoBegin).count()  << std::endl;
-                //          << " ms ! \n Writing output to " << outPath << std::endl;
-                // std::cout << "Bob sends SHS : " << ch3.bytesSent() << " Bytes," << std::endl;
-                //                }
 
                 sendSet_sharesB = sender.getReceiver_shares();
                 recvSet_sharesB = sender.getSenderA_shares();
@@ -474,16 +453,9 @@ namespace volePSI
                 macoro::sync_wait(recver.runSpHshPsiOsn(chl, ch2, set, (withPayload ? dataset[1] : set)));
 
                 auto protoEnd = timer.setTimePoint("");
-                //    if (!quiet)
-                //    {
-                //        std::cout << "Alice : protocol takes " << std::chrono::duration_cast<std::chrono::milliseconds>(protoEnd - protoBegin).count()
-                //                  << " ms ! \n Writing output to " << outPath << std::endl;
-                //        std::cout << "Alice sends SHS : " << ch2.bytesSent() << " Bytes," << std::endl;
-                //    }
 
                 recvSet_sharesA = recver.getReceiver_shares(); // share of Sender A's payload derived by OSN
                 sendSet_sharesA = recver.getSenderB_shares();  // share of Sender B's payload sentby SHS
-                //    cardinality = recver.getCardinality();
 
                 // WJ: write PL shares into output file.
                 auto myPiA = recver.getmyPi();
@@ -535,10 +507,7 @@ namespace volePSI
                 if (!quiet)
                 {
                     std::cout << "\nOverall time overhead is " << std::chrono::duration_cast<std::chrono::milliseconds>(protoEnd - protoBegin).count() << " ms,\n";
-                    //         << " ms ! \n Writing output to " << outPath << std::endl;
                     std::cout << "Overall communication overhead is " << ch3.bytesSent() + ch3.bytesReceived() << " Bytes, " << std::endl;
-                    //                    std::cout << " SHS sends Bob : " << ch3.bytesSent() << " Bytes, " << std::flush;
-                    //                    std::cout << " SHS sends Alice : " << ch2.bytesSent() << " Bytes, " << std::endl;
                 }
 
                 mSenderA_shares = server.getSenderA_shares();
@@ -554,12 +523,6 @@ namespace volePSI
                 macoro::sync_wait(ch2.flush());
                 macoro::sync_wait(ch3.flush());
 
-                // writeOutput(outPath, ft, server.getmIntersectionB(), indexOnly, path, bHashIt);
-                //  TKL for verification
-                // std::cout << "******* Receiver Set *******" << std::endl;
-                // uint64_t value, total = 0;
-                // std::vector<u64> intersectionA = server.getmIntersectionA();
-                // std::vector<u64> intersectionB = server.getmIntersectionB();
                 std::vector<int> myPi_A = server.getMyPi_A();
                 std::vector<int> myPi_B = server.getMyPi_B();
 
@@ -575,32 +538,15 @@ namespace volePSI
                     //*to recover SenderA's Payload*//
                     auto j1 = myPi_A[i];
                     auto tmpPL1 = mSenderA_shares[j1] ^ mSenderA_Ownshares[i];
-                    // std::cout << i << " tmpPL1=" << tmpPL1 << " [" << intersectionA[i] << "]  " << std::endl;
-                    //  Only for non 32 char hex payload
-                    // std::string ss1 = blockToString(tmpPL1); // 24/03/2025 jwang
-                    std::string ss1 = hexToString(blockToString(tmpPL1)); // 24/03/2025 jwang
-                    // wj delete//     ss1 = is_ascii(ss1.c_str(), ss1.length())? ss1 : "" ;
-                    // std::cout << "i=" << i << ", j1=" << j1 << ", tmp=" << tmpPL1 << "[" << intersectionA[i] << "] = " << ss1 << std::endl;
-                    /*wj delete//    if (isNumber(ss1)) {
-                                          value = std::stoul (ss1,nullptr,0);
-                                          total += value;
-                                      }*/
+
+                    std::string ss1 = hexToString(blockToString(tmpPL1));
 
                     //*to recover SenderB's Payload*//
                     auto j2 = myPi_B[i];
                     block tmpPL2 = mSenderB_shares[j2] ^ mSenderB_Ownshares[i];
-                    // std::cout << i << " tmpPL2=" << tmpPL2 << " [" << intersectionB[i] << "] " << std::endl;
-                    //  Only for non 32 char hex payload
-                    //  std::string ss2 = blockToString(tmpPL2); // 24/03/2025 jwang
+
                     std::string ss2 = hexToString(blockToString(tmpPL2)); // 24/03/2025 jwang
-                    //  wj delete//     ss2 = is_ascii(ss2.c_str(), ss2.length())? ss2 : "" ;
-                    //  std::cout << "i=" << i << ", j2=" << j2 << " tmpPL2=" << tmpPL2 << "[" << intersectionB[i] << "] = " << ss2 << std::endl;
-                    /*wj delete//       if (isNumber(ss2)) {
-                                            value = std::stoul (ss2,nullptr,0);
-                                            total += value;
-                                        }*/
-                    // std::cout << i << mSenderA_Ownshares[i] << ", " << mSenderB_shares[j2] << std::endl;
-                    // std::cout << i << mSenderA_shares[j1] << ", " << mSenderB_Ownshares[i] << std::endl;
+
                     outFile << ss1 << "," << ss2 << "\n"; // Write each string followed by a newline
                 }
                 outFile.close();
@@ -634,11 +580,6 @@ namespace volePSI
         macoro::sync_wait(chl.flush());
         std::cout << "received  data : \n"
                   << std::flush;
-        /*        for (int i; i < size; i++)
-                {
-                    std::cout << data[i] << ", " << std::flush;
-                }
-                std::cout << std::endl; */
     }
     void Bob(std::string &ip, std::vector<block> &data)
     {

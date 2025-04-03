@@ -123,8 +123,7 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 			else
 				switched[lvl_p + 2][perm_idx] = 1;
 		}
-		// std::cout<<"based case 3:"<<switched[lvl_p][perm_idx]<<" "<<switched[lvl_p+1][perm_idx]<<"
-		// "<<switched[lvl_p+2][perm_idx];
+
 		return;
 	}
 
@@ -219,18 +218,9 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 	int idx = int(ceil(values * 0.5));
 	if (values % 2 == 1)
 	{
-		// for (int i=0; i <= idx-2; ++i)
-		//  top2[i] = top2[i+1];
-		// printf("top2 added %d at location %d \n",dest[values-1], idx);
-		top2[idx - 1] = dest[values - 1];
-		// cout<<"pushing destination: "<<dest[values];
-	}
 
-	/*
-	std::cout<<"sizes of vectors - bottom 1: "<<bottom1.size()
-	<<" bottom 2: "<<bottom2.size()<<" top 1: "<<top1.size()
-	<<"top 2: "<<top2.size();
-	*/
+		top2[idx - 1] = dest[values - 1];
+	}
 
 	/*
 	 * recursivitate prin partea superioara si inferioara
@@ -347,8 +337,6 @@ void Benes::gen_benes_masked_evaluate(int n, int lvl_p, int perm_idx, vector<oc:
 	oc::block temp, temp_int[2];
 	std::array<oc::block, 2> temp_block;
 
-	uint64_t Val = ot_output[0].size(); //   number of inputs in the entire benes network
-
 	if (values == 2)
 	{
 		if (n == 1)
@@ -363,8 +351,6 @@ void Benes::gen_benes_masked_evaluate(int n, int lvl_p, int perm_idx, vector<oc:
 				src[0] = src[1];
 				src[1] = temp;
 			}
-			// std::cout<<"base index: "<<" "<<(lvl_p)*(Val/2)+perm_idx<<" switch = "<<s<<" upper =
-			// "<<src[0]<<" "<<" lower = "<<src[1]<<" "<<temp_int[1]<<std::endl;
 		}
 		else
 		{
@@ -430,10 +416,6 @@ void Benes::gen_benes_masked_evaluate(int n, int lvl_p, int perm_idx, vector<oc:
 		temp_block = ot_output[lvl_p][perm_idx + i / 2];
 		memcpy(temp_int, temp_block.data(), sizeof(temp_int));
 
-		// std::cout<<"testing index : "<<(lvl_p)*(Val/2)+perm_idx+i/2<<std::endl;
-		// std::cout<<" input 1 : "<<src[i]<< " input 2 : "<<src[i^1]<<"ot message :"<<temp_int[0]
-		//<<" "<<temp_int[1]<<std::endl;
-
 		src[i] = src[i] ^ temp_int[0];
 		src[i ^ 1] = src[i ^ 1] ^ temp_int[1]; //  ^ or | ??
 
@@ -453,13 +435,11 @@ void Benes::gen_benes_masked_evaluate(int n, int lvl_p, int perm_idx, vector<oc:
 	if (values % 2 == 1)
 	{
 		top1.push_back(src[values - 1]);
-		// cout<<"pushing source: "<<src[values]<<"\n";
 	}
 
 	gen_benes_masked_evaluate(n - 1, lvl_p + 1, perm_idx, bottom1, ot_output);
 	gen_benes_masked_evaluate(n - 1, lvl_p + 1, perm_idx + values / 4, top1, ot_output);
 
-	// std::vector<uint64_t> test_vec(src.size());
 	for (i = 0; i < values - 1; i += 2)
 	{
 		s = switched[lvl_p + levels - 1][perm_idx + i / 2];
@@ -497,8 +477,6 @@ osuCrypto::BitVector Benes::return_gen_benes_switches(int values)
 		for (int i = 0; i < values / 2; ++i)
 		{
 			switches[j * (values / 2) + i] = (switched[j][i]);
-			// std::cout<<j*(values/2) +i<<" "<<int(switched[j][i])<<" "<<switches[j*(values/2)
-			// +i]<<std::endl;
 		}
 	return switches;
 }

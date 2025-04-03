@@ -150,66 +150,7 @@ task<> OSNSender::rand_ot_recv(osuCrypto::BitVector &choices,
 OSNSender::OSNSender(size_t size, int ot_type) : size(size), ot_type(ot_type)
 {
 }
-/*
-// TKL
-void OSNSender::init(size_t size, int ot_type, const string& osn_cache, const std::vector<uint64_t > intersection)
-{
-	this->size = size;
-	this->ot_type = ot_type;
 
-	int values = size;
-	int N = int(ceil(log2(values)));
-	int levels = 2 * N - 1;
-
-	dest.resize(size);
-	benes.initialize(values, levels);
-
-	std::vector<int> src(values);
-
-	if (intersection.size() == 0) {  // TKL
-		for (int i = 0; i < src.size(); ++i)
-			src[i] = dest[i] = i;
-	}else {  // TKL
-		for (int i = 0; i < intersection.size(); ++i)
-			 dest[i] = intersection[i] ;
-		int count = intersection.size(), j = count;
-		for (int i = 0; i < size; ++i) {
-			src[i] = i;
-			if (count == 0 || (std::find(intersection.begin(), intersection.end(), i) == intersection.end())) {
-				dest[j] = i;
-				j++;
-			} else
-				count--;
-		}
-	}
-
-	osuCrypto::PRNG prng(_mm_set_epi32(4253233465, 334565, 0, 235)); // we need to modify this seed
-	int diff = size - intersection.size();
-	for (int i = size - 1; i > intersection.size(); --i) {
-		int loc = prng() % (diff) + intersection.size() ; // Pick random location in the array
-		std::swap(dest[i], dest[loc]);
-	}
-
-	if (osn_cache != "")
-	{
-		string file = osn_cache + "_" + to_string(size);
-		if (!benes.load(file))
-		{
-			cout << "OSNSender is generating osn cache!" << endl;
-			benes.gen_benes_route(N, 0, 0, src, dest);
-			benes.dump(file);
-		}
-		else
-		{
-			cout << "OSNSender is using osn cache!" << endl;
-		}
-	}
-	else
-	{
-		benes.gen_benes_route(N, 0, 0, src, dest);
-	}
-}
- */
 // WJ
 void OSNSender::init_wj(size_t size, int ot_type, const std::string &osn_cache, std::map<int, int> &i2locptr)
 {
