@@ -2,14 +2,22 @@ set(DEP_NAME            sparsehash-c11)
 set(GIT_REPOSITORY      https://github.com/sparsehash/sparsehash-c11.git)
 set(GIT_TAG             "edd6f1180156e76facc1c0449da245208ab39503" )
 
-set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
-set(BUILD_DIR "${CLONE_DIR}/out/build/${VOLEPSI_CONFIG}")
+set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
+set(BUILD_DIR "${CLONE_DIR}/build/${VOLEPSI_CONFIG}")
 set(LOG_FILE  "${CMAKE_CURRENT_LIST_DIR}/log-${DEP_NAME}.txt")
 
 
 include("${CMAKE_CURRENT_LIST_DIR}/fetch.cmake")
+execute_process(COMMAND chmod -R 755 ${LOG_DIR})
 
 if(NOT SPARSEHASH_FOUND)
+
+    if(EXISTS ${CLONE_DIR})
+        message(WARNING "Removing existing directory: ${CLONE_DIR}")
+        # For Linux, use rm -rf to remove the directory
+        execute_process(COMMAND rm -rf ${CLONE_DIR})
+    endif()
+
     find_program(GIT git REQUIRED)
     set(DOWNLOAD_CMD  ${GIT} clone ${GIT_REPOSITORY})
     set(CHECKOUT_CMD  ${GIT} checkout ${GIT_TAG})
@@ -42,23 +50,4 @@ install(
     DESTINATION "include")
 
 install(CODE "message(\"sparsehash end ------------------\")")    
-
-        
-#install(CODE "
-#    if(MSVC)
-#        file(COPY ${CLONE_DIR}/src/sparsehash DESTINATION \${CMAKE_INSTALL_PREFIX}/include/)
-#        file(COPY ${CLONE_DIR}/src/windows/sparsehash DESTINATION \${CMAKE_INSTALL_PREFIX}/include/)
-#    else()
-#        message(\"sparse hash install\")
-#        execute_process(
-#            COMMAND ./configure --prefix=
-#            COMMAND make -j ${PARALLEL_FETCH}
-#            COMMAND ${SUDO} make DESTDIR= install
-#            WORKING_DIRECTORY ${CLONE_DIR}
-#            RESULT_VARIABLE RESULT
-#            COMMAND_ECHO STDOUT
-#        )
-#        message(\"sparse hash install done\")
-#
-#    endif()
-#")
+execute_process(COMMAND rm -rf ${CLONE_DIR})
