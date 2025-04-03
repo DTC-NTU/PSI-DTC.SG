@@ -35,8 +35,7 @@ namespace volePSI
             mVoleSender.setTimer(*mTimer);
 
         numThreads = std::max<u64>(1, numThreads);
-        // mVoleSender.mNumThreads = numThreads;
-        //  a + b  = c * d
+
         fork = chl.fork();
         fu = genVole(prng, fork, reducedRounds) | macoro::make_eager();
 
@@ -159,12 +158,10 @@ namespace volePSI
         auto v = val.data();
         std::array<block, 8> h;
 
-        // todo, parallelize this.
         if (mMalicious)
         {
             oc::MultiKeyAES<8> hasher;
 
-            // main = 0;
             for (u64 i = 0; i < main; i += 8)
             {
                 oc::mAesFixedKey.hashBlocks<8>(v, h.data());
@@ -207,7 +204,6 @@ namespace volePSI
             for (u64 i = 0; i < main; i += 8)
             {
                 oc::mAesFixedKey.hashBlocks<8>(v, h.data());
-                // auto h = v;
 
                 o[0] = o[0] ^ mD.gf128Mul(h[0]);
                 o[1] = o[1] ^ mD.gf128Mul(h[1]);
@@ -302,9 +298,6 @@ namespace volePSI
         oc::mAesFixedKey.hashBlocks(values, h);
         setTimePoint("RsOprfReceiver::receive-hash");
 
-        // auto pPtr = std::make_shared<std::vector<block>>(paxos.size());
-        // span<block> p = *pPtr;
-
         p.resize(paxos.size());
 
         setTimePoint("RsOprfReceiver::receive-alloc");
@@ -313,7 +306,6 @@ namespace volePSI
         setTimePoint("RsOprfReceiver::receive-solve");
         co_await (fu);
 
-        // a + b  = c * d
         a = mVoleRecver.mA;
         c = mVoleRecver.mC;
 
@@ -324,8 +316,6 @@ namespace volePSI
             co_await (chl.send(std::move(wr)));
         }
 
-        // if (numThreads > 1)
-        //     thrd.join();
         if (0)
         {
             {
@@ -352,7 +342,6 @@ namespace volePSI
 
             setTimePoint("RsOprfReceiver::receive-xor");
 
-            // send c ^ p
             co_await (chl.send(std::move(p)));
         }
         else
@@ -423,13 +412,6 @@ namespace volePSI
 
                 auto w = ws ^ wr;
 
-                // todo, parallelize this.
-
-                // compute davies-meyer F
-                //    F(x) = H( Decode(x, a) + w, x)
-                // where
-                //    H(u,v) = AES_u(v) ^ v
-
                 oc::MultiKeyAES<8> hasher;
                 auto main = outputs.size() / 8 * 8;
                 auto o = outputs.data();
@@ -445,7 +427,6 @@ namespace volePSI
                     o[6] = o[6] ^ w;
                     o[7] = o[7] ^ w;
 
-                    // o = H(o, v)
                     hasher.setKeys({o, 8});
                     hasher.hashNBlocks(v, o);
 
@@ -462,12 +443,7 @@ namespace volePSI
         }
         else
         {
-            // todo, parallelize this.
 
-            // compute davies-meyer-Oseas F
-            //      F(x) = H(Decode(x, a))
-            // where
-            //      H(u) = AES_fixed(u) ^ u
             oc::mAesFixedKey.hashBlocks(outputs, outputs);
         }
 
