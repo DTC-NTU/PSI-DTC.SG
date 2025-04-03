@@ -275,16 +275,14 @@ namespace volePSI
             auto protoBegin = timer.setTimePoint("PSI+OSN begin");
 
             auto path = cmd.getOr<std::string>("SpHsh", ""); // shs -SpHsh .dataset/cleartext.csv
-            // auto outPath = cmd.getOr<std::string>("out", path + ".out");
             std::string outPath = path;
             std::string prefix = "./dataset/";
-            std::string outprefix = "Out";
+            std::string outprefix = "out_";
             size_t pos = outPath.rfind(prefix);
             if (pos != std::string::npos)
             {
                 outPath = outPath.insert(pos + prefix.length(), outprefix);
             }
-            //            auto outPath = cmd.getOr<std::string>("out", path); // JW: remove suffix .out
             bool debug = cmd.isSet("debug");
             bool quiet = cmd.isSet("quiet");
             bool verbose = cmd.isSet("v");

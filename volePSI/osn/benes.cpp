@@ -153,7 +153,6 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 	 * inferioara a retelei
 	 */
 	fill(path.begin(), path.end(), -1);
-	// memset(path, -1, sizeof(path));
 	if (values % 2 == 1)
 	{
 		path[values - 1] = 1;
@@ -187,13 +186,11 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 				bottom1.push_back(src[i | j]);
 			else
 				top1.push_back(src[i | j]);
-			// input_wires[lvl_p][perm_idx + i / 2][j] = src[i | j];
 		}
 	}
 	if (values % 2 == 1)
 	{
 		top1.push_back(src[values - 1]);
-		// cout<<"pushing source: "<<src[values]<<"\n";
 	}
 
 	// partea inferioara
@@ -208,10 +205,7 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 			else
 			{
 				top2[i / 2] = src[perm[i | j]];
-				// std:cout<<"top2 index "<<x - values / 2<<" : "<<src[perm[i | j]]<<std::endl;
-				// top2[x - values / 2]
-			}
-			// input_wires[lvl_p + levels - 1][perm_idx + i / 2][j] = src[perm[i | j]];
+					}
 		}
 	}
 
@@ -298,7 +292,6 @@ void Benes::gen_benes_eval(int n, int lvl_p, int perm_idx, vector<uint64_t> &src
 	if (values % 2 == 1)
 	{
 		top1.push_back(src[values - 1]);
-		// cout<<"pushing source: "<<src[values]<<"\n";
 	}
 
 	gen_benes_eval(n - 1, lvl_p + 1, perm_idx, bottom1);
