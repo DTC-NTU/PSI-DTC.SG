@@ -9,25 +9,6 @@ set(SRCS
     "fileBased.cpp"
     )
 
-if(VOLE_PSI_ENABLE_GMW)
-    list(APPEND SRCS
-        "GMW/Circuit.cpp"
-        "GMW/Gmw.cpp"
-        "GMW/SilentTripleGen.cpp"
-    )
-endif()
-
-if(VOLE_PSI_ENABLE_CPSI)
-    list(APPEND SRCS
-        "RsCpsi.cpp"
-    )
-endif()
-
-if(VOLE_PSI_ENABLE_OPPRF)
-    list(APPEND SRCS
-    "RsOpprf.cpp"
-    )
-endif()
 
 set(MY_LIBS libOTe cryptoTools relic_s)
 

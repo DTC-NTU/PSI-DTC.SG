@@ -129,7 +129,6 @@ namespace volePSI
         std::vector<u64> getmIntersectionA() { return mIntersectionA; }
         std::vector<u64> getmIntersectionB() { return mIntersectionB; }
         //        void setmIntersectionB();   //WJ : for testing the getter error due to task<>
-        task<> run(Socket &chl, Socket &ch2);
         task<> runSpHshPSI(Socket &ch1, Socket &ch2); // WJ: simple hash PSI.
         task<> run_OSN_Ssingle(Socket &chl, OSNSender &OsnSender, std::vector<u64> intersection,
                                size_t size, std::vector<block> &sender_shares);

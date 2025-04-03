@@ -14,28 +14,6 @@
 namespace volePSI
 {
 
-    void SimpleIndex::print()
-    {
-
-        for (u64 i = 0; i < mBins.size(); ++i)
-        //	for (u64 i = 0; i <1; ++i)
-        {
-            std::cout << "Bin #" << i << std::endl;
-
-            std::cout << " contains " << mBinSizes[i] << " elements" << std::endl;
-
-            for (u64 j = 0; j < mBinSizes[i]; ++j)
-            {
-                std::cout << "    idx=" << mBins(i, j).idx() << "  hIdx=" << mBins(i, j).hashIdx() << std::endl;
-                //	std::cout << "    " << mBins[i].first[j] << "  " << mBins[i].second[j] << std::endl;
-            }
-
-            std::cout << std::endl;
-        }
-
-        std::cout << std::endl;
-    }
-
     // template<unsigned int N = 16>
     double getBinOverflowProb(u64 numBins, u64 numBalls, u64 getBinSize, double epsilon = 0.0001)
     {
@@ -322,49 +300,6 @@ namespace volePSI
         mBinSizes.resize(numBins, 0);
         mItemToBinMap.resize(numBalls, numHashFunction);
         mNumBins = numBins;
-    }
-
-    void SimpleIndex::insertItems(span<block> items, block hashingSeed)
-    {
-        oc::CuckooIndex<> cuckoo;
-
-        {
-            //cuckoo.mLocations.resize(items.size(), mNumHashFunctions, oc::AllocType::Uninitialized);
-            u64 binCount = mNumBins;
-
-            // mBins.resize(binCount, mMaxBinSize);
-            // mStash.resize(mParams.mStashSize);
-            // mNumBins = binCount;
-            // mNumBinMask = mParams.binMask();
-
-            cuckoo.mMods.resize(mNumHashFunctions);
-            for (u64 i = 0; i < cuckoo.mMods.size(); ++i)
-            {
-                cuckoo.mMods[i] = oc::Mod(binCount - i);
-            }
-        }
-
-        // cuckoo.computeLocations()
-
-        oc::Matrix<u32> locations(32, mNumHashFunctions);
-        std::array<block, 32> hashs;
-        oc::AES hasher(hashingSeed);
-        for (u64 i = 0; i < items.size(); i += hashs.size())
-        {
-            auto min = std::min<u64>(items.size() - i, hashs.size());
-            hasher.hashBlocks(items.data() + i, min, hashs.data());
-
-            cuckoo.computeLocations(hashs, locations);
-
-            for (u64 j = 0; j < mNumHashFunctions; ++j)
-            {
-                for(u64 k = 0; k < min; ++k)
-                {
-                    auto loc = locations(k,j);
-                    mBins(loc, mBinSizes[loc]++).set(i+k, j);
-                }
-            }
-        }
     }
 
 }
