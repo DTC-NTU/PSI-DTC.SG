@@ -12,6 +12,30 @@
 using namespace std;
 using namespace oc;
 
+bool Benes::dump(const std::string &filename)
+{
+	ofstream out(filename, ios::out | ios::binary);
+	if (!out.is_open())
+		return false;
+	size_t benes_size = path.size();
+	size_t values = perm.size();
+	size_t levels = switched.size();
+	out.write((char *)&benes_size, sizeof(size_t));
+	out.write((char *)&values, sizeof(size_t));
+	out.write((char *)&levels, sizeof(size_t));
+	// out << benes_size << values << levels;
+	out.write(path.data(), benes_size * sizeof(path[0]));
+	out.write((char *)perm.data(), values * sizeof(perm[0]));
+	out.write((char *)inv_perm.data(), values * sizeof(inv_perm[0]));
+
+	for (size_t i = 0; i < levels; i++)
+	{
+		out.write((char *)switched[i].data(), (values / 2) * sizeof(switched[i][0]));
+	}
+	out.close();
+	return true;
+}
+
 bool Benes::load(const std::string &filename)
 {
 	ifstream in(filename, ios::in | ios::binary);
@@ -205,7 +229,7 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 			else
 			{
 				top2[i / 2] = src[perm[i | j]];
-					}
+			}
 		}
 	}
 

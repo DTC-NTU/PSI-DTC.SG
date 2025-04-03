@@ -166,10 +166,11 @@ void OSNSender::init_wj(size_t size, int ot_type, const std::string &osn_cache, 
 
 	if (osn_cache != "")
 	{
-		string file = osn_cache + "_" + to_string(size);
+		string file = "./benes/" + osn_cache + "_" + to_string(size);
 		if (!benes.load(file))
 		{
 			benes.gen_benes_route(N, 0, 0, src, dest);
+			benes.dump(file);
 		}
 		else
 		{
