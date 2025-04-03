@@ -2,8 +2,8 @@ set(DEP_NAME            sparsehash-c11)
 set(GIT_REPOSITORY      https://github.com/sparsehash/sparsehash-c11.git)
 set(GIT_TAG             "edd6f1180156e76facc1c0449da245208ab39503" )
 
-set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
-set(BUILD_DIR "${CLONE_DIR}/build/${VOLEPSI_CONFIG}")
+set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
+set(BUILD_DIR "${CLONE_DIR}/out/build/${VOLEPSI_CONFIG}")
 set(LOG_FILE  "${CMAKE_CURRENT_LIST_DIR}/log-${DEP_NAME}.txt")
 
 

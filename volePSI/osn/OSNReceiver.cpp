@@ -79,7 +79,7 @@ task<> OSNReceiver::gen_benes_client_osn(int values, Socket &chl, std::vector<st
 
 		co_await (chl.recv(bit_correction));
 		osuCrypto::block tmp;
-		for (int k = 0; k < tmp_messages.size(); k++)
+		for (auto k = 0u; k < tmp_messages.size(); k++)
 		{
 			if (bit_correction[k] == 1)
 			{
@@ -88,7 +88,7 @@ task<> OSNReceiver::gen_benes_client_osn(int values, Socket &chl, std::vector<st
 				tmp_messages[k][1] = tmp;
 			}
 		}
-		for (auto i = 0; i < ot_messages.size(); i++)
+		for (auto i = 0u; i < ot_messages.size(); i++)
 		{
 			ot_messages[i][0] = {tmp_messages[i][0], aes.ecbEncBlock(tmp_messages[i][0])};
 			ot_messages[i][1] = {tmp_messages[i][1], aes.ecbEncBlock(tmp_messages[i][1])};
@@ -98,7 +98,7 @@ task<> OSNReceiver::gen_benes_client_osn(int values, Socket &chl, std::vector<st
 	{
 		tmp_messages = std::vector<std::array<osuCrypto::block, 2>>(switches);
 		co_await (rand_ot_send(tmp_messages, chl)); // sample random ot blocks
-		for (auto i = 0; i < ot_messages.size(); i++)
+		for (auto i = 0u; i < ot_messages.size(); i++)
 		{
 			ot_messages[i][0] = {tmp_messages[i][0], aes.ecbEncBlock(tmp_messages[i][0])};
 			ot_messages[i][1] = {tmp_messages[i][1], aes.ecbEncBlock(tmp_messages[i][1])};
@@ -134,14 +134,14 @@ task<> OSNReceiver::run_osn(oc::span<block> inputs, Socket &chl, std::vector<oc:
 	auto benes_input = std::vector<block>{};
 	co_await (gen_benes_client_osn(values, chl, ret_masks));
 
-	for (int i = 0; i < values; ++i)
+	for (auto i = 0u; i < values; ++i)
 		ret_masks[i][0] = ret_masks[i][0] ^ inputs[i];
-	for (int i = 0; i < values; ++i)
+	for (auto i = 0u; i < values; ++i)
 		benes_input.push_back(ret_masks[i][0]);
 
 	co_await (chl.send(benes_input));
 
-	for (int i = 0; i < values; ++i)
+	for (auto i = 0u; i < values; ++i)
 		output_masks.push_back(ret_masks[i][1]);
 }
 
@@ -163,7 +163,7 @@ void OSNReceiver::prepare_correction(int n, int Val, int lvl_p, int perm_idx, st
 	std::vector<block> top1;
 
 	block m0, m1, w0, w1, M0[2], M1[2], corr_mesg[2];
-	std::array<oc::block, 2> corr_block, temp_block;
+	std::array<oc::block, 2> temp_block;
 
 	if (values == 2)
 	{

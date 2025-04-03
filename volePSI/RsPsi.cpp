@@ -248,7 +248,7 @@ namespace volePSI
         myPiA = mOsnSenderA.getPi();
         myPiB.resize(mIntersectionB.size());
         myPiB = mOsnSenderB.getPi();
-        for (auto i = 0; i < myPiA.size(); i++)
+        for (auto i = 0u; i < myPiA.size(); i++)
         {
             auto j1 = myPiA[i];
             interPLA.push_back(mSenderA_shares[j1]);

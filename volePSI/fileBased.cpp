@@ -197,7 +197,7 @@ namespace volePSI
             ret.push_back(retIndex);
             // Process other columns
             if (data.size() > 1)
-                for (int k = 1; k < data.size(); k++)
+                for (auto k = 1u; k < data.size(); k++)
                 {
                     std::vector<block> retPayload;
                     auto column = data[k];
@@ -286,7 +286,6 @@ namespace volePSI
             }
             //            auto outPath = cmd.getOr<std::string>("out", path); // JW: remove suffix .out
             bool debug = cmd.isSet("debug");
-            bool indexOnly = cmd.isSet("indexSet");
             bool quiet = cmd.isSet("quiet");
             bool verbose = cmd.isSet("v");
 
@@ -391,17 +390,13 @@ namespace volePSI
             if ((!quiet) && (!isServer))
                 std::cout << "Establishing connection takes " << std::chrono::duration_cast<std::chrono::milliseconds>(connEnd - connBegin).count()
                           << " ms,\nstart to run secure inner join... " << std::flush;
-            //            auto protoBegin = timer.setTimePoint("PSI+OSN begin");
             if (r == Role::Sender)
             {
                 RsPsi3rdPSenderB sender;
-                //    size_t cardinality;
                 std::vector<block> sendSet_sharesB;
                 std::vector<block> recvSet_sharesB;
                 std::vector<block> interShareB2SHS;
                 macoro::sync_wait(sender.runSpHshPsiOsn(chl, ch3, set, (withPayload ? dataset[1] : set)));
-
-                auto protoEnd = timer.setTimePoint("PSI+OSN end");
 
                 sendSet_sharesB = sender.getReceiver_shares();
                 recvSet_sharesB = sender.getSenderA_shares();
@@ -415,19 +410,17 @@ namespace volePSI
                 if (!outFile.is_open())
                     throw std::runtime_error("Error opening file for writing !");
 
-                for (auto i = 0; i < myPiB.size(); i++)
+                for (auto i = 0u; i < myPiB.size(); i++)
                 {
                     //*to write SenderB's Payload*//
                     auto j1 = myPiB[i];
                     auto tmpPL1 = sendSet_sharesB[j1];
                     interShareB2SHS.push_back(tmpPL1);
                     std::string ss1 = blockToString(tmpPL1);
-                    //                    std::string ss1 = hexToString(blockToString(tmpPL1));
 
                     //*to recover SenderA's Payload*//
                     block tmpPL2 = recvSet_sharesB[i];
                     std::string ss2 = blockToString(tmpPL2);
-                    // std::string ss2 = hexToString(blockToString(tmpPL2));
 
                     outFile << ss2 << "," << ss1 << "\n"; // Write each string followed by a newline
                 }
@@ -438,7 +431,6 @@ namespace volePSI
                 macoro::sync_wait(ch3.flush());
                 if (verbose)
                 {
-                    // std::cout << "\nIntesection_size = " << cardinality << std::endl;
                     std::cout << "sendSet_sharesB size= " << sendSet_sharesB.size() << std::endl;
                     std::cout << "recvSet_sharesB size=" << recvSet_sharesB.size() << std::endl;
                 }
@@ -446,13 +438,10 @@ namespace volePSI
             else if (r == Role::Receiver)
             {
                 RsPsi3rdPSenderA recver;
-                //     size_t cardinality;
                 std::vector<block> sendSet_sharesA;
                 std::vector<block> recvSet_sharesA;
                 std::vector<block> interShareA2SHS;
                 macoro::sync_wait(recver.runSpHshPsiOsn(chl, ch2, set, (withPayload ? dataset[1] : set)));
-
-                auto protoEnd = timer.setTimePoint("");
 
                 recvSet_sharesA = recver.getReceiver_shares(); // share of Sender A's payload derived by OSN
                 sendSet_sharesA = recver.getSenderB_shares();  // share of Sender B's payload sentby SHS
@@ -466,19 +455,17 @@ namespace volePSI
                 if (!outFile.is_open())
                     throw std::runtime_error("Error opening file for writing !");
 
-                for (auto i = 0; i < myPiA.size(); i++)
+                for (auto i = 0u; i < myPiA.size(); i++)
                 {
                     //*to write SenderA's Payload*//
                     auto j1 = myPiA[i];
                     auto tmpPL1 = recvSet_sharesA[j1];
                     interShareA2SHS.push_back(tmpPL1);
                     std::string ss1 = blockToString(tmpPL1);
-                    //                    std::string ss1 = hexToString(blockToString(tmpPL1));
 
                     //*to recover SenderB's Payload*//
                     block tmpPL2 = sendSet_sharesA[i];
                     std::string ss2 = blockToString(tmpPL2);
-                    // std::string ss2 = hexToString(blockToString(tmpPL2));
 
                     outFile << ss1 << "," << ss2 << "\n"; // Write each string followed by a newline
                 }
@@ -533,7 +520,7 @@ namespace volePSI
                 if (!outFile.is_open())
                     throw std::runtime_error("Error opening file for writing !");
 
-                for (auto i = 0; i < myPi_A.size(); i++)
+                for (auto i = 0u; i < myPi_A.size(); i++)
                 {
                     //*to recover SenderA's Payload*//
                     auto j1 = myPi_A[i];
