@@ -444,33 +444,6 @@ namespace volePSI
         co_await (ch2.recv(myPi_SdrB));
     }
 
-    Proto RsPsi3rdPSenderB::run_OSN_integrated(Socket &chl, Socket &ch2, std::vector<block> &sendSet, std::vector<block> &payloadSet, u64 theirSize,
-                                               u64 statSecParam, block seed, bool mal, u64 nt, bool reduced)
-    {
-        setTimePoint("BOB : enter protocol");
-        init(sendSet.size(), theirSize, statSecParam, seed, mal, nt, reduced);
-        // TKL start of OSN
-        // setTimePoint("BOB : FIRST");
-        co_await (ch2.send(sendSet.size())); // TKL added to send set size to server.
-        // setTimePoint("BOB : send set size");
-        co_await (run(sendSet, chl, ch2));
-        setTimePoint("BOB : PSI is done");
-
-        //     MC_AWAIT(ch2.recv(mCardinality));   // recv cardinality frem server
-
-        getOSNReceiver().init(sendSet.size(), 1); // TKL
-
-        setTimePoint("BOB : before run_osn");
-
-        co_await (getOSNReceiver().run_osn(payloadSet, ch2, mReceiver_shares));
-
-        setTimePoint("BOB : after run_osn");
-        mSenderA_shares.resize(mReceiver_shares.size());
-        co_await (ch2.recv(mSenderA_shares)); // recv senderB's shares
-        setTimePoint("BOB : Receive shares from SHS");
-        // TKL end of OSN
-    }
-
     // WJ: run simple hash psi, Alice
     task<> RsPsi3rdPSenderA::runSpHshPSI(span<block> inputs, Socket &chl, Socket &ch2) // chl: to Bob; ch2: to SHS
     {
@@ -562,31 +535,6 @@ namespace volePSI
         // MC_AWAIT(ch2.recv(mCardinality));
         myPi_SdrA.resize(mCardinality);
         co_await (ch2.recv(myPi_SdrA));
-    }
-    Proto RsPsi3rdPSenderA::run_OSN_integrated(Socket &chl, Socket &ch2, std::vector<block> &recvdSet, std::vector<block> &payloadSet, u64 theirSize,
-                                               u64 statSecParam, block seed, bool mal, u64 nt, bool reduced)
-    {
-        setTimePoint("ALICE : enter protocol");
-        init(theirSize, recvdSet.size(), statSecParam, seed, mal, nt, reduced);
-        // TKL start of OSN
-        // setTimePoint("ALICE : FIRST");
-        co_await (ch2.send(recvdSet.size())); // TKL added to send set size to server.
-
-        // setTimePoint("ALICE : send set size");
-        co_await (run(recvdSet, chl, ch2));
-        setTimePoint("ALICE : PSI is done");
-        //    MC_AWAIT(ch2.recv(mCardinality));   // recv cardinality frem server
-        getOSNReceiver().init(recvdSet.size(), 1); // TKL
-
-        setTimePoint("ALICE : before run_osn");
-
-        co_await (getOSNReceiver().run_osn(payloadSet, ch2, mReceiver_shares));
-
-        setTimePoint("ALICE : after run_osn");
-        mSenderB_shares.resize(mReceiver_shares.size());
-        co_await (ch2.recv(mSenderB_shares)); // recv senderB's shares
-        setTimePoint("ALICE : Receive shares from SHS");
-        // TKL end of OSN
     }
 
     // WJ : Simple hash psi
@@ -970,106 +918,4 @@ namespace volePSI
         co_await (macoro::when_all_ready(chl.send(std::move(myPiB)), ch2.send(std::move(myPiA))));
     }
 
-    Proto RsPsi3rdPReceiver::run_OSN_integrated(Socket &chl, Socket &ch2, u64 statSecParam, block seed, bool mal, u64 nt, bool reduced) // chl: to Bob ;  ch2: to Alice
-    {
-        setTimePoint("SHS : enter protocol");
-        // TKL start of OSN
-
-        // setTimePoint("SHS : FIRST");
-        co_await (ch2.recv(mRecverSize)); // TKL from sender A - receiver
-        // setTimePoint("SHS : recv set size from A");
-
-        co_await (chl.recv(mSenderSize)); // TKL from sender B - sender
-        // setTimePoint("SHS : recv set size from B");
-
-        init(mSenderSize, mRecverSize, statSecParam, seed, mal, nt, reduced);
-        co_await (run(chl, ch2));
-        setTimePoint("SHS : PSI is done.");
-
-        co_await (run_OSN_Ssingle(chl, mOsnSenderB, mIntersectionB, mSenderSize, mSenderB_shares));
-        setTimePoint("SHS : osn with Bob is done");
-
-        co_await (run_OSN_Ssingle(ch2, mOsnSenderA, mIntersectionA, mRecverSize, mSenderA_shares));
-        setTimePoint("SHS : osn with Alice is done");
-
-        /*  MC_AWAIT(macoro::when_all_ready(run_OSN_Ssingle(ch2, mOsnSenderA, mIntersectionA, mRecverSize, mSenderA_shares),
-                                         run_OSN_Ssingle(chl, mOsnSenderB, mIntersectionB, mSenderSize, mSenderB_shares))); */
-
-        co_await (chl.send(mSenderA_shares)); // send senderA's shares to sender B
-        co_await (ch2.send(mSenderB_shares)); // send senderB's shares  to sender A
-        setTimePoint("SHS : osn shares sent to A B");
-    }
-
-    void RsPsi3rdPReceiver::myTimerPrinter(oc::Timer &mTimer) // WJ: to bemchmark AVERAGE time eclapse
-    {
-        auto timer = mTimer.mTimes;
-        if (timer.size() > 1)
-        {
-            u64 maxStars = 10;
-            u64 p = 9;
-            u64 width = 0;
-            auto maxLog = 1.0;
-
-            {
-                auto prev = timer.begin();
-                auto iter = timer.begin();
-                ++iter;
-
-                while (iter != timer.end())
-                {
-                    width = std::max<u64>(width, iter->second.size());
-                    auto diff = std::chrono::duration_cast<std::chrono::microseconds>(iter->first - prev->first).count() / 1000.0;
-                    maxLog = std::max(maxLog, std::log2(diff));
-                    ++iter;
-                    ++prev;
-                }
-            }
-            width += 3;
-
-            auto prev = timer.begin();
-            auto iter = timer.begin();
-            ++iter;
-
-            std::map<std::string, std::pair<double, u32>> steptime;
-            std::vector<std::string> inserOrder;
-            double total = std::chrono::duration_cast<std::chrono::microseconds>(timer.back().first - timer.front().first).count() / 1000.0;
-            // std::map<std::string, u32> count;
-            while (iter != timer.end())
-            {
-                auto time = std::chrono::duration_cast<std::chrono::microseconds>(iter->first - timer.front().first).count() / 1000.0;
-                auto diff = std::chrono::duration_cast<std::chrono::microseconds>(iter->first - prev->first).count() / 1000.0;
-
-                auto it = steptime.find(iter->second);
-
-                if (it != steptime.end())
-                {
-                    it->second.first += diff;
-                    it->second.second++;
-                }
-                else
-                {
-                    steptime[iter->second] = {diff, 1};
-                    inserOrder.push_back(iter->second);
-                }
-
-                ++prev;
-                ++iter;
-            }
-
-            std::cout << "\n"
-                      << std::left << std::setfill(' ') << std::setw(width) << "Label  "
-                      << "  " << std::setw(p) << "Total Time (ms)"
-                      << "  " << std::setw(p) << "AVG Time (ms)\n__________________________________" << std::endl;
-
-            for (const auto &key : inserOrder)
-            {
-                // std::cout <<  << " ";
-                std::cout << std::setw(width) << std::left << key
-                          << "  " << std::right << std::fixed << std::setprecision(3) << std::setw(p) << steptime[key].first
-                          << "  " << std::right << std::fixed << std::setprecision(3) << std::setw(p) << steptime[key].first / steptime[key].second
-                          << std::endl;
-            }
-            std::cout << "Total time (ms): " << total << std::endl;
-        }
-    }
 }

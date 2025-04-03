@@ -12,49 +12,25 @@
 using namespace std;
 using namespace oc;
 
-bool Benes::dump(const std::string& filename)
-{
-	ofstream out(filename, ios::out | ios::binary);
-	if (!out.is_open())
-		return false;
-	size_t benes_size = path.size();
-	size_t values = perm.size();
-	size_t levels = switched.size();
-	out.write((char*)&benes_size, sizeof(size_t));
-	out.write((char*)&values, sizeof(size_t));
-	out.write((char*)&levels, sizeof(size_t));
-	//out << benes_size << values << levels;
-	out.write(path.data(), benes_size * sizeof(path[0]));
-	out.write((char*)perm.data(), values * sizeof(perm[0]));
-	out.write((char*)inv_perm.data(), values * sizeof(inv_perm[0]));
-	
-	for (size_t i = 0; i < levels; i++)
-	{
-		out.write((char*)switched[i].data(), (values / 2) * sizeof(switched[i][0]));
-	}
-	out.close();
-	return true;
-}
-
-bool Benes::load(const std::string& filename)
+bool Benes::load(const std::string &filename)
 {
 	ifstream in(filename, ios::in | ios::binary);
 	if (!in.is_open())
 		return false;
 	size_t benes_size, values, levels;
-	in.read((char*)&benes_size, sizeof(size_t));
-	in.read((char*)&values, sizeof(size_t));
-	in.read((char*)&levels, sizeof(size_t));
+	in.read((char *)&benes_size, sizeof(size_t));
+	in.read((char *)&values, sizeof(size_t));
+	in.read((char *)&levels, sizeof(size_t));
 	path.resize(benes_size);
 	perm.resize(values);
 	inv_perm.resize(values);
 	switched.resize(levels);
 	in.read(path.data(), benes_size * sizeof(path[0]));
-	in.read((char*)perm.data(), values * sizeof(perm[0]));
-	in.read((char*)inv_perm.data(), values * sizeof(inv_perm[0]));
+	in.read((char *)perm.data(), values * sizeof(perm[0]));
+	in.read((char *)inv_perm.data(), values * sizeof(inv_perm[0]));
 	for (size_t i = 0; i < levels; i++)
 	{
-		in.read((char*)switched[i].data(), (values / 2) * sizeof(switched[i][0]));
+		in.read((char *)switched[i].data(), (values / 2) * sizeof(switched[i][0]));
 	}
 	in.close();
 	return true;
@@ -69,20 +45,6 @@ void Benes::initialize(int values, int levels)
 	switched.resize(levels);
 	for (int i = 0; i < levels; ++i)
 		switched[i].resize(values / 2);
-}
-
-osuCrypto::BitVector Benes::return_switches(int N)
-{
-	int values = 1 << N;
-	int levels = 2 * N - 1;
-	osuCrypto::BitVector switches(values * levels / 2);
-	for (int j = 0; j < levels; ++j)
-		for (int i = 0; i < values / 2; ++i)
-		{
-			switches[(values * j) / 2 + i] = switched[j][i];
-			// std::cout<<" . "<<int(switched[i][j])<<" -> "<<switches[values*j+i];
-		}
-	return switches;
 }
 
 void Benes::DFS(int idx, int route)
@@ -110,7 +72,7 @@ int shuffle(int i, int n) { return ((i & 1) << (n - 1)) | (i >> 1); }
 
 // n <- number of layers in the network (initialize as int(ceil(log2(src.size()))) )
 void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &src,
-					 const vector<int> &dest)
+							const vector<int> &dest)
 {
 	int levels, i, j, x, s;
 	vector<int> bottom1;
@@ -192,7 +154,7 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 	 * inferioara a retelei
 	 */
 	fill(path.begin(), path.end(), -1);
-	//memset(path, -1, sizeof(path));
+	// memset(path, -1, sizeof(path));
 	if (values % 2 == 1)
 	{
 		path[values - 1] = 1;
@@ -376,7 +338,7 @@ void Benes::gen_benes_eval(int n, int lvl_p, int perm_idx, vector<uint64_t> &src
 }
 
 void Benes::gen_benes_masked_evaluate(int n, int lvl_p, int perm_idx, vector<oc::block> &src,
-							   vector<vector<array<osuCrypto::block, 2>>> &ot_output)
+									  vector<vector<array<osuCrypto::block, 2>>> &ot_output)
 {
 	int levels, i, j, x, s;
 	vector<oc::block> bottom1;
@@ -540,5 +502,3 @@ osuCrypto::BitVector Benes::return_gen_benes_switches(int values)
 		}
 	return switches;
 }
-
-

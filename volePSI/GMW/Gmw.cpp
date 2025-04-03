@@ -12,7 +12,7 @@ namespace volePSI
     using PRNG = oc::PRNG;
     void Gmw::init(
         u64 n,
-        BetaCircuit& cir,
+        BetaCircuit &cir,
         u64 numThreads,
         u64 pIdx,
         block seed)
@@ -26,7 +26,6 @@ namespace volePSI
         mCir.levelByAndDepth(mLevelize);
         mNumRounds = mCir.mLevelCounts.size();
 
-
         mGates = mCir.mGates;
         mWords.resize(mCir.mWireCount, oc::divCeil(mN, 128));
 
@@ -37,22 +36,20 @@ namespace volePSI
 
         mNumOts = mWords.cols() * 128 * mCir.mNonlinearGateCount * 2;
 
-
         mPrint = mCir.mPrints.begin();
     }
 
     Proto Gmw::generateTriple(
         u64 batchSize,
         u64 numThreads,
-        coproto::Socket& chl)
+        coproto::Socket &chl)
     {
-        MC_BEGIN(Proto,this, &tg = mSilent, batchSize, numThreads, &chl,
-            A2 = std::vector<block>{},
-            B2 = std::vector<block>{},
-            C2 = std::vector<block>{},
-            D2 = std::vector<block>{},
-            mid = mNumOts / 128 / 2
-        );
+        MC_BEGIN(Proto, this, &tg = mSilent, batchSize, numThreads, &chl,
+                 A2 = std::vector<block>{},
+                 B2 = std::vector<block>{},
+                 C2 = std::vector<block>{},
+                 D2 = std::vector<block>{},
+                 mid = mNumOts / 128 / 2);
 
         if (mNumOts == 0)
             MC_RETURN_VOID();
@@ -64,7 +61,6 @@ namespace volePSI
         tg.init(mNumOts, batchSize, numThreads, mIdx ? Mode::Receiver : Mode::Sender, mPrng.get());
         if (tg.hasBaseOts() == false)
             MC_AWAIT(tg.generateBaseOts(mIdx, mPrng, chl));
-
 
         MC_AWAIT(tg.expand(chl));
         if (mIdx)
@@ -115,14 +111,12 @@ namespace volePSI
                     std::cout << "bad triple at 1." << i << ", n " << mNumOts << std::endl;
                     throw std::runtime_error("");
                 }
-
             }
         }
 
         setTimePoint("Gmw::generateTriple end");
         MC_END();
     }
-
 
     void Gmw::implSetInput(u64 i, oc::MatrixView<u8> input, u64 alignment)
     {
@@ -144,15 +138,9 @@ namespace volePSI
         oc::transpose(input, memView);
     }
 
-    void Gmw::setZeroInput(u64 i)
+    Proto Gmw::run(coproto::Socket &chl)
     {
-        oc::MatrixView<u8> memView = getInputView(i);
-        memset(memView.data(), 0, memView.size());
-    }
-
-    Proto Gmw::run(coproto::Socket& chl)
-    {
-        MC_BEGIN(Proto,this, &chl, i = u64{});
+        MC_BEGIN(Proto, this, &chl, i = u64{});
 
         if (mA.size() == 0)
         {
@@ -204,7 +192,7 @@ namespace volePSI
         if (mCir.mInputs.size() <= i)
             throw RTE_LOC;
 
-        auto& inWires = mCir.mInputs[i];
+        auto &inWires = mCir.mInputs[i];
 
         return getMemView(inWires);
     }
@@ -214,23 +202,23 @@ namespace volePSI
         if (mCir.mOutputs.size() <= i)
             throw RTE_LOC;
 
-        auto& wires = mCir.mOutputs[i];
+        auto &wires = mCir.mOutputs[i];
 
         return getMemView(wires);
     }
 
-    oc::MatrixView<u8> Gmw::getMemView(BetaBundle& wires)
+    oc::MatrixView<u8> Gmw::getMemView(BetaBundle &wires)
     {
         // we assume the input bundles are contiguous.
         for (u64 j = 1; j < wires.size(); ++j)
             if (wires[j - 1] + 1 != wires[j])
                 throw RTE_LOC;
 
-        oc::MatrixView<u8> memView((u8*)mWords[wires[0]].data(), wires.size(), mWords.cols() * 16);
+        oc::MatrixView<u8> memView((u8 *)mWords[wires[0]].data(), wires.size(), mWords.cols() * 16);
         return memView;
     }
 
-    //void Gmw::genSilentTriples(u64 batchSize, u64 numThreads)
+    // void Gmw::genSilentTriples(u64 batchSize, u64 numThreads)
     //{
 
     //    mSilent.init(mNumOts, batchSize, numThreads, Mode::Dual, mPrng.get());
@@ -238,7 +226,7 @@ namespace volePSI
     //}
 
     // The basic protocol where the inputs are not shared:
-    // Sender has 
+    // Sender has
     //   > input x
     //   > rand  a, b
     // Recver has
@@ -254,7 +242,7 @@ namespace volePSI
     // Observer z1 + z2 = xy
     //
     // The full protocol where the inputs are shared:
-    // Sender has 
+    // Sender has
     //   > input x1, y1
     // Recver has
     //   > input x2, y2
@@ -262,35 +250,34 @@ namespace volePSI
     // The protocols invoke the basic protocol twice.
     //   > Sender inputs (x1, y1)
     //   > Recver inputs (y2, x2)
-    // 
+    //
     //   > Sender receives (z11, z21)
     //   > Recver receives (z12, z22)
     //
     // The final output is:
-    // Sender outputs: z1 = x1y1 + z11 + z21 
+    // Sender outputs: z1 = x1y1 + z11 + z21
     //                    = x1y1 + (x1y2 + r1) + (x2y1 +r2)
     //                    = x1y1 + x1y2 + x2y1 + r
-    // Recver outputs: z2 = x2y2 + z12 + z22 
+    // Recver outputs: z2 = x2y2 + z12 + z22
     //                    = x2y2 + r1 + r2
     //                    = x2y2 + r
-    Proto Gmw::roundFunction(coproto::Socket& chl)
+    Proto Gmw::roundFunction(coproto::Socket &chl)
     {
-        MC_BEGIN(Proto,this, &chl,
-            gates = span<oc::BetaGate>{},
-            gate = span<oc::BetaGate>::iterator{},
-            dirtyBits = std::vector<u8>{},
-            pinnedInputs = std::vector<u8>{},
-            in = std::array<span<block>, 2>{},
-            out = span<block>{},
-            ww = std::vector<block>{},
-            print = std::move(coproto::unique_function<void(u64)>{})
-        );
+        MC_BEGIN(Proto, this, &chl,
+                 gates = span<oc::BetaGate>{},
+                 gate = span<oc::BetaGate>::iterator{},
+                 dirtyBits = std::vector<u8>{},
+                 pinnedInputs = std::vector<u8>{},
+                 in = std::array<span<block>, 2>{},
+                 out = span<block>{},
+                 ww = std::vector<block>{},
+                 print = std::move(coproto::unique_function<void(u64)>{}));
 
         if (mRoundIdx >= mNumRounds)
             throw std::runtime_error("round function called too many times");
 
-        //if (mIdx && mO.mDebug)
-        //    oc::lout << "round " << mRoundIdx << std::endl;
+        // if (mIdx && mO.mDebug)
+        //     oc::lout << "round " << mRoundIdx << std::endl;
 
         gates = mGates.subspan(0, mCir.mLevelCounts[mRoundIdx]);
         mGates = mGates.subspan(mCir.mLevelCounts[mRoundIdx]);
@@ -303,15 +290,15 @@ namespace volePSI
 
         for (gate = gates.begin(); gate < gates.end(); ++gate)
         {
-            in = { mWords[gate->mInput[0]], mWords[gate->mInput[1]] };
+            in = {mWords[gate->mInput[0]], mWords[gate->mInput[1]]};
             out = mWords[gate->mOutput];
 
-            //if (mIdx && mO.mDebug)
+            // if (mIdx && mO.mDebug)
             //{
-            //    oc::RandomOracle ro(16);
-            //    ro.Update(mWords.data(), mWords.size());
-            //    block h;
-            //    ro.Final(h);
+            //     oc::RandomOracle ro(16);
+            //     ro.Update(mWords.data(), mWords.size());
+            //     block h;
+            //     ro.Final(h);
 
             //    oc::lout << "g " << gate->mInput[0] << " " << gate->mInput[1] << " " <<
             //        gateToString(gate->mType) << " " << gate->mOutput << " ~ " << h << std::endl;
@@ -372,7 +359,7 @@ namespace volePSI
 
         for (gate = gates.begin(); gate < gates.end(); ++gate)
         {
-            in = { mWords[gate->mInput[0]], mWords[gate->mInput[1]] };
+            in = {mWords[gate->mInput[0]], mWords[gate->mInput[1]]};
             out = mWords[gate->mOutput];
 
             if (gate->mType == oc::GateType::na_And ||
@@ -385,11 +372,10 @@ namespace volePSI
             }
         }
 
-
-
         if (mO.mDebug)
         {
-            print = [&](u64 gIdx) {
+            print = [&](u64 gIdx)
+            {
                 while (
                     mDebugPrintIdx < mN &&
                     mPrint != mCir.mPrints.end() &&
@@ -401,7 +387,7 @@ namespace volePSI
 
                     if (wireIdx != ~u32(0))
                     {
-                        oc::BitIterator iter((u8*)mO.mWords[wireIdx].data(), mDebugPrintIdx);
+                        oc::BitIterator iter((u8 *)mO.mWords[wireIdx].data(), mDebugPrintIdx);
                         auto mem = u64(*iter);
                         std::cout << (u64)(mem ^ (invert ? 1 : 0));
                     }
@@ -412,7 +398,7 @@ namespace volePSI
                 }
             };
 
-            for (auto& gate : gates)
+            for (auto &gate : gates)
             {
 
                 auto gIdx = &gate - mCir.mGates.data();
@@ -420,15 +406,15 @@ namespace volePSI
 
                 for (u64 i = 0; i < mWords.cols(); ++i)
                 {
-                    auto& a = mO.mWords(gate.mInput[0], i);
-                    auto& b = mO.mWords(gate.mInput[1], i);
-                    auto& c = mO.mWords(gate.mOutput, i);
-                    //if (gate.mOutput == 129)
+                    auto &a = mO.mWords(gate.mInput[0], i);
+                    auto &b = mO.mWords(gate.mInput[1], i);
+                    auto &c = mO.mWords(gate.mOutput, i);
+                    // if (gate.mOutput == 129)
                     //{
-                    //    auto cc=
-                    //        (oc::AllOneBlock ^ a) & b;
-                    //    std::cout << "~" << a << " & " << b << " -> " << cc << std::endl;
-                    //}
+                    //     auto cc=
+                    //         (oc::AllOneBlock ^ a) & b;
+                    //     std::cout << "~" << a << " & " << b << " -> " << cc << std::endl;
+                    // }
 
                     switch (gate.mType)
                     {
@@ -445,11 +431,11 @@ namespace volePSI
                         c = (a | b) ^ oc::AllOneBlock;
                         break;
                     case oc::GateType::nb_And:
-                        //oc::lout << "* ~" << a << " & " << b << " -> " << ((oc::AllOneBlock ^ a) & b) << std::endl;
+                        // oc::lout << "* ~" << a << " & " << b << " -> " << ((oc::AllOneBlock ^ a) & b) << std::endl;
                         c = a & (oc::AllOneBlock ^ b);
                         break;
                     case oc::GateType::na_And:
-                        //oc::lout << "* ~" << a << " & " << b << " -> " << ((oc::AllOneBlock ^ a) & b) << std::endl;
+                        // oc::lout << "* ~" << a << " & " << b << " -> " << ((oc::AllOneBlock ^ a) & b) << std::endl;
                         c = (oc::AllOneBlock ^ a) & b;
                         break;
                     case oc::GateType::Xor:
@@ -489,7 +475,6 @@ namespace volePSI
                     throw RTE_LOC;
                 }
             }
-
         }
 
         ++mRoundIdx;
@@ -497,12 +482,8 @@ namespace volePSI
         MC_END();
     }
 
-    oc::BitVector view(block v, u64 l = 10)
+    namespace
     {
-        return oc::BitVector((u8*)&v, l);
-    }
-
-    namespace {
         bool invertA(oc::GateType gt)
         {
             bool invertX;
@@ -566,7 +547,7 @@ namespace volePSI
     }
 
     // The basic protocol where the inputs are not shared:
-    // Sender has 
+    // Sender has
     //   > input x
     //   > rand  a, b
     // Recver has
@@ -581,13 +562,12 @@ namespace volePSI
     //                            = ac + xc + (ac + b)
     //                            = cx + b
     // Observer z1 + z2 = xy
-    Proto Gmw::multSendP1(span<block> x, coproto::Socket& chl, oc::GateType gt)
+    Proto Gmw::multSendP1(span<block> x, coproto::Socket &chl, oc::GateType gt)
     {
-        MC_BEGIN(Proto,this, x, &chl, gt,
-            width = x.size(),
-            a = span<block>{},
-            u = std::vector<block>{}
-        );
+        MC_BEGIN(Proto, this, x, &chl, gt,
+                 width = x.size(),
+                 a = span<block>{},
+                 u = std::vector<block>{});
         a = mA.subspan(0, width);
         mA = mA.subspan(width);
 
@@ -603,20 +583,19 @@ namespace volePSI
                 u.push_back(a[i] ^ x[i] ^ oc::AllOneBlock);
         }
 
-        //oc::lout << mIdx << " " << "u = a + x" << std::endl << view(u[0]) << " = " << view(a[0]) << " + " << view(x[0]) << std::endl;
+        // oc::lout << mIdx << " " << "u = a + x" << std::endl << view(u[0]) << " = " << view(a[0]) << " + " << view(x[0]) << std::endl;
 
         MC_AWAIT(chl.send(std::move(u)));
         MC_END();
     }
 
-    Proto Gmw::multSendP2(span<block> y, coproto::Socket& chl, oc::GateType gt)
+    Proto Gmw::multSendP2(span<block> y, coproto::Socket &chl, oc::GateType gt)
     {
 
-        MC_BEGIN(Proto,this, y, &chl, gt,
-            width = y.size(),
-            c = span<block>{},
-            w = std::vector<block>{}
-        );
+        MC_BEGIN(Proto, this, y, &chl, gt,
+                 width = y.size(),
+                 c = span<block>{},
+                 w = std::vector<block>{});
         c = mC.subspan(0, width);
         mC = mC.subspan(width);
 
@@ -633,19 +612,18 @@ namespace volePSI
                 w.push_back(c[i] ^ (y[i] ^ oc::AllOneBlock));
         }
 
-        //oc::lout << mIdx << " " << "w = z + y" << std::endl << view(w[0]) << " = " << view(z[0]) << " + " << view(y[0]) << std::endl;
+        // oc::lout << mIdx << " " << "w = z + y" << std::endl << view(w[0]) << " = " << view(z[0]) << " + " << view(y[0]) << std::endl;
 
         MC_AWAIT(chl.send(std::move(w)));
         MC_END();
     }
 
-    Proto Gmw::multRecvP1(span<block> x, span<block> z, coproto::Socket& chl, oc::GateType gt)
+    Proto Gmw::multRecvP1(span<block> x, span<block> z, coproto::Socket &chl, oc::GateType gt)
     {
-        MC_BEGIN(Proto,this, x, z, &chl, gt,
-            width = x.size(),
-            b = span<block>{},
-            w = std::vector<block>{}
-        );
+        MC_BEGIN(Proto, this, x, z, &chl, gt,
+                 width = x.size(),
+                 b = span<block>{},
+                 w = std::vector<block>{});
         w.resize(width);
         MC_AWAIT(chl.recv(w));
 
@@ -668,18 +646,17 @@ namespace volePSI
         }
 
         MC_END();
-        //oc::lout << mIdx << " " << "z1 = x * w" << std::endl << view(z[0]) << " = " << view(x[0]) << " * " << view(w[0]) << std::endl;
+        // oc::lout << mIdx << " " << "z1 = x * w" << std::endl << view(z[0]) << " = " << view(x[0]) << " * " << view(w[0]) << std::endl;
     }
 
-    Proto Gmw::multRecvP2(span<block> y, span<block> z, coproto::Socket& chl)
+    Proto Gmw::multRecvP2(span<block> y, span<block> z, coproto::Socket &chl)
     {
 
-        MC_BEGIN(Proto,this, z, &chl,
-            width = y.size(),
-            c = span<block>{},
-            d = span<block>{},
-            u = std::vector<block>{}
-        );
+        MC_BEGIN(Proto, this, z, &chl,
+                 width = y.size(),
+                 c = span<block>{},
+                 d = span<block>{},
+                 u = std::vector<block>{});
         u.resize(width);
         MC_AWAIT(chl.recv(u));
 
@@ -693,23 +670,21 @@ namespace volePSI
             z[i] = (c[i] & u[i]) ^ d[i];
         }
 
-
         MC_END();
-        //oc::lout << mIdx << " " << "z2 = z * u + d" << std::endl << view(z[0]) << " = " << view(z[0]) << " * " << view(u[0]) << " + " << view(d[0]) << std::endl;
-
+        // oc::lout << mIdx << " " << "z2 = z * u + d" << std::endl << view(z[0]) << " = " << view(z[0]) << " * " << view(u[0]) << " + " << view(d[0]) << std::endl;
     }
 
-    Proto Gmw::multSendP1(span<block> x, span<block> y, coproto::Socket& chl, oc::GateType gt)
+    Proto Gmw::multSendP1(span<block> x, span<block> y, coproto::Socket &chl, oc::GateType gt)
     {
-        MC_BEGIN(Proto,this, x, y, &chl, gt);
+        MC_BEGIN(Proto, this, x, y, &chl, gt);
         MC_AWAIT(multSendP1(x, chl, gt));
         MC_AWAIT(multSendP2(y, chl, gt));
         MC_END();
     }
 
-    Proto Gmw::multSendP2(span<block> x, span<block> y, coproto::Socket& chl)
+    Proto Gmw::multSendP2(span<block> x, span<block> y, coproto::Socket &chl)
     {
-        MC_BEGIN(Proto,this, x, y, &chl);
+        MC_BEGIN(Proto, this, x, y, &chl);
 
         MC_AWAIT(multSendP2(y, chl, oc::GateType::And));
         MC_AWAIT(multSendP1(x, chl, oc::GateType::And));
@@ -717,16 +692,14 @@ namespace volePSI
         MC_END();
     }
 
-
-    Proto Gmw::multRecvP1(span<block> x, span<block> y, span<block> z, coproto::Socket& chl, oc::GateType gt)
+    Proto Gmw::multRecvP1(span<block> x, span<block> y, span<block> z, coproto::Socket &chl, oc::GateType gt)
     {
-        MC_BEGIN(Proto,this, x, y, z, &chl, gt,
-            zz = std::vector<block>{},
-            zz2 = std::vector<block>{},
-            xm = block{},
-            ym = block{},
-            zm = block{}
-        );
+        MC_BEGIN(Proto, this, x, y, z, &chl, gt,
+                 zz = std::vector<block>{},
+                 zz2 = std::vector<block>{},
+                 xm = block{},
+                 ym = block{},
+                 zm = block{});
 
         zz.resize(z.size());
         zz2.resize(z.size());
@@ -750,12 +723,11 @@ namespace volePSI
         MC_END();
     }
 
-    Proto Gmw::multRecvP2(span<block> x, span<block> y, span<block> z, coproto::Socket& chl)
+    Proto Gmw::multRecvP2(span<block> x, span<block> y, span<block> z, coproto::Socket &chl)
     {
-        MC_BEGIN(Proto,this, x, y, z, &chl,
-            zz = std::vector<block>{},
-            zz2 = std::vector<block>{}
-        );
+        MC_BEGIN(Proto, this, x, y, z, &chl,
+                 zz = std::vector<block>{},
+                 zz2 = std::vector<block>{});
 
         zz.resize(z.size());
         zz2.resize(z.size());
@@ -770,6 +742,5 @@ namespace volePSI
 
         MC_END();
     }
-
 
 }

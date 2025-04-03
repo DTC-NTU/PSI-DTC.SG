@@ -49,32 +49,4 @@ namespace volePSI
         return cd;
     }
 
-    void isZeroCircuit_Test()
-    {
-        u64 n = 128, tt = 100;
-        auto cir = isZeroCircuit(n);
-
-        {
-            oc::BitVector bv(n), out(1);
-            cir.evaluate({&bv, 1}, {&out, 1}, false);
-
-            if (out[0] != 1)
-                throw RTE_LOC;
-        }
-
-        oc::PRNG prng(oc::ZeroBlock);
-
-        for (u64 i = 0; i < tt; ++i)
-        {
-            oc::BitVector bv(n), out(1);
-            bv.randomize(prng);
-            if (bv.hammingWeight() == 0)
-                continue;
-
-            cir.evaluate({&bv, 1}, {&out, 1}, false);
-
-            if (out[0] != 0)
-                throw RTE_LOC;
-        }
-    }
 }
