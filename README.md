@@ -27,13 +27,13 @@ To run PSA with Alice (Sender), Bob (Receiver), and the Service Provider:
    ```bash
    ./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0 -indexSet
    ```
-2. **Run the Sender (Alice)**:
+2. **Run the Receiver (Bob)**:
    ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 1 -csv -hash 0
+   ./out/build/linux/frontend/frontend -SpHsh ./dataset/receiver.csv -r 1 -csv -hash 0
    ```
-3. **Run the Receiver (Bob)**:
+3. **Run the Sender (Alice)**:
    ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/receiver.csv -r 0 -csv -hash 0
+   ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
    ```
 
 These three roles (Alice, Bob, and Service Provider) work together to perform secure analytics without exposing sensitive data. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
