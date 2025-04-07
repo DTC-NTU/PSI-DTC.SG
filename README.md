@@ -2,6 +2,8 @@
 
 **PSA** is a privacy-preserving technique enabling secure, collaborative analytics between two parties with vertically partitioned datasets, without directly sharing sensitive data. This demo integrates **Private Set Intersection (PSI)** and an **Oblivious Switching Network** to achieve efficient and secure **Private Set Alignment (PSA)**.
 
+This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparsehash](https://github.com/sparsehash/sparsehash), [Coproto](https://github.com/Visa-Research/coproto), [volepsi](https://github.com/Visa-Research/volepsi).
+
 ## Performance Metrics
 
 - Dataset Join Time: 35.5 seconds (1 million records)
@@ -27,16 +29,16 @@ To run PSA with Alice (Sender), Bob (Receiver), and the Service Provider:
    ```bash
    ./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0 -indexSet
    ```
-2. **Run the Sender (Alice)**:
+2. **Run the Receiver (Bob)**:
    ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 1 -csv -hash 0
+   ./out/build/linux/frontend/frontend -SpHsh ./dataset/receiver.csv -r 1 -csv -hash 0
    ```
-3. **Run the Receiver (Bob)**:
+3. **Run the Sender (Alice)**:
    ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/receiver.csv -r 0 -csv -hash 0
+   ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
    ```
 
-These three roles (Alice, Bob, and Service Provider) work together to perform secure analytics without exposing sensitive data. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
+These three roles (Alice, Bob, and Service Provider) work together to perform secure inner join. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
 
 ## Input and Output Validation
 
@@ -46,42 +48,49 @@ To verify the correct execution, you can inspect the input and output files:
 
 The input files from Alice and Bob are **CSV files** with the following format:
 
-- **Column 1**: ID (in ascending order, increasing by 1 and 2 for each row, respectively)
-- **Column 2**: Attribute (Alice's or Bob's, depending on the file)
+- **Column 1**: ID
+- **Column 2**: Attribute/Payload (Alice's or Bob's, depending on the file)
 
 For example:
 
-**Alice Input CSV** (alice_data.csv):
+**Alice Input CSV** (sender.csv):
 
 ```
-1, A1
-2, A2
-3, A3
+FIMbdVN0P2hWkmQp,697626930337
+bg4t3fVY1Tw3ASlv,61650378238787
+6jJykxRGyuCz5ciy,43313803051
+yKE23VylSP1OKELN,75738363176449
+OGvQHQP2rm4D6GZR,006609232196
+WkYkdx24K2t646BK,658936928362438
+...
 ```
 
-**Bob Input CSV** (bob_data.csv):
+**Bob Input CSV** (receiver.csv):
 
 ```
-1, B1
-2, B2
-3, B3
+FIMbdVN0P2hWkmQp,intersection8
+bKdYp0OZYmlCwUXx,apple
+B9syDpwL6b8jUTr5,elephant
+lUcaUy90isDcKkaV,dog
+rQR2DOLJxU0PvrVe,zebra
+0EadHpwt7NqUE3tF,intersection6
+...
 ```
 
 ### Output Data Format
 
 The expected output file, `out_cleartext.csv`, will have the following format:
 
-- **Column 1**: Attribute from Alice (AttributeAlice)
-- **Column 2**: Attribute from Bob (AttributeBob)
+- **Column 1**: Attribute/Payload from Alice 
+- **Column 2**: Attribute/Payload from Bob
 
 For example:
 
-**Output CSV** (Outcleartext.csv):
+**Output CSV** (out_cleartext.csv):
 
 ```
-A1, B1
-A2, B2
-A3, B3
+intersection8,697626930337
+...
 ```
 
 ### Expected Output
@@ -92,7 +101,7 @@ After running the scripts for **Alice**, **Bob**, and the **Service Provider**, 
 
 If the input CSV files for Alice and Bob are:
 
-**alice_data.csv**:
+**sender.csv**:
 
 ```
 1, A1
@@ -103,7 +112,7 @@ If the input CSV files for Alice and Bob are:
 6, A6
 ```
 
-**bob_data.csv**:
+**receiver.csv**:
 
 ```
 0, B0
@@ -144,7 +153,7 @@ doi = {10.48550/arXiv.2410.04746}
 ## Authors
 
 - **Jiabo Wang**
-- **Fedrico Giorgio Pfahler**
+- **Federico Giorgio Pfahler**
 - **Elmo Xuyun Huang**
 - **Pu Duan**
 - **Huaxiong Wang**
