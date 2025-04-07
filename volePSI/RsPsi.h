@@ -39,24 +39,6 @@ namespace volePSI
         };
     }
 
-    class RsPsiSender : public details::RsPsiBase, public oc::TimerAdapter
-    {
-    public:
-        RsOprfSender mSender;
-
-        void setMultType(oc::MultType type) { mSender.setMultType(type); };
-        Proto run(span<block> inputs, Socket &chl);
-    };
-
-    class RsPsiReceiver : public details::RsPsiBase, public oc::TimerAdapter
-    {
-    public:
-        RsOprfReceiver mRecver;
-
-        std::vector<u64> mIntersection;
-        void setMultType(oc::MultType type) { mRecver.setMultType(type); };
-    };
-
     // TKL added
     class RsPsi3rdPSenderA : public details::RsPsiBase, public oc::TimerAdapter
     {
