@@ -38,7 +38,7 @@ To run PSA with Alice (Sender), Bob (Receiver), and the Service Provider:
    ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
    ```
 
-These three roles (Alice, Bob, and Service Provider) work together to perform secure analytics without exposing sensitive data. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
+These three roles (Alice, Bob, and Service Provider) work together to perform secure inner join. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
 
 ## Input and Output Validation
 
@@ -53,7 +53,7 @@ The input files from Alice and Bob are **CSV files** with the following format:
 
 For example:
 
-**Alice Input CSV** (alice_data.csv):
+**Alice Input CSV** (sender.csv):
 
 ```
 1, A1
@@ -61,7 +61,7 @@ For example:
 3, A3
 ```
 
-**Bob Input CSV** (bob_data.csv):
+**Bob Input CSV** (receiver.csv):
 
 ```
 1, B1
@@ -78,7 +78,7 @@ The expected output file, `out_cleartext.csv`, will have the following format:
 
 For example:
 
-**Output CSV** (Outcleartext.csv):
+**Output CSV** (out_cleartext.csv):
 
 ```
 A1, B1
@@ -94,7 +94,7 @@ After running the scripts for **Alice**, **Bob**, and the **Service Provider**, 
 
 If the input CSV files for Alice and Bob are:
 
-**alice_data.csv**:
+**sender.csv**:
 
 ```
 1, A1
@@ -105,7 +105,7 @@ If the input CSV files for Alice and Bob are:
 6, A6
 ```
 
-**bob_data.csv**:
+**receiver.csv**:
 
 ```
 0, B0
