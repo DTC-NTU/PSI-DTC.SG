@@ -48,7 +48,7 @@ To verify the correct execution, you can inspect the input and output files:
 
 The input files from Alice and Bob are **CSV files** with the following format:
 
-- **Column 1**: ID (in ascending order, increasing by 1 and 2 for each row, respectively)
+- **Column 1**: ID
 - **Column 2**: Attribute (Alice's or Bob's, depending on the file)
 
 For example:
@@ -56,17 +56,25 @@ For example:
 **Alice Input CSV** (sender.csv):
 
 ```
-1, A1
-2, A2
-3, A3
+FIMbdVN0P2hWkmQp,697626930337
+bg4t3fVY1Tw3ASlv,61650378238787
+6jJykxRGyuCz5ciy,43313803051
+yKE23VylSP1OKELN,75738363176449
+OGvQHQP2rm4D6GZR,006609232196
+WkYkdx24K2t646BK,658936928362438
+...
 ```
 
 **Bob Input CSV** (receiver.csv):
 
 ```
-1, B1
-2, B2
-3, B3
+FIMbdVN0P2hWkmQp,intersection8
+bKdYp0OZYmlCwUXx,apple
+B9syDpwL6b8jUTr5,elephant
+lUcaUy90isDcKkaV,dog
+rQR2DOLJxU0PvrVe,zebra
+0EadHpwt7NqUE3tF,intersection6
+...
 ```
 
 ### Output Data Format
@@ -81,9 +89,8 @@ For example:
 **Output CSV** (out_cleartext.csv):
 
 ```
-A1, B1
-A2, B2
-A3, B3
+intersection8,697626930337
+...
 ```
 
 ### Expected Output
