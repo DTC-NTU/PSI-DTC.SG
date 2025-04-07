@@ -27,7 +27,7 @@ To run PSA with Alice (Sender), Bob (Receiver), and the Service Provider:
 
 1. **Run the Service Provider**:
    ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0 -indexSet
+   ./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0 
    ```
 2. **Run the Receiver (Bob)**:
    ```bash
