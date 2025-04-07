@@ -1,6 +1,5 @@
 #include "OSNSender.h"
 #include "libOTe/Base/BaseOT.h"
-// #include "cryptoTools/Common/BitVector.h"
 #include "cryptoTools/Crypto/AES.h"
 #include "libOTe/TwoChooseOne/Silent/SilentOtExtReceiver.h"
 #include "libOTe/TwoChooseOne/Iknp/IknpOtExtReceiver.h"

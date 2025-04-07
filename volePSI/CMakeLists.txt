@@ -1,6 +1,5 @@
 set(SRCS
     "RsPsi.cpp"
-    "SimpleIndex.cpp"
     "fileBased.cpp"
     )
 
