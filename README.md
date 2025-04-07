@@ -49,7 +49,7 @@ To verify the correct execution, you can inspect the input and output files:
 The input files from Alice and Bob are **CSV files** with the following format:
 
 - **Column 1**: ID
-- **Column 2**: Attribute (Alice's or Bob's, depending on the file)
+- **Column 2**: Attribute/Payload (Alice's or Bob's, depending on the file)
 
 For example:
 
@@ -81,8 +81,8 @@ rQR2DOLJxU0PvrVe,zebra
 
 The expected output file, `out_cleartext.csv`, will have the following format:
 
-- **Column 1**: Attribute from Alice (AttributeAlice)
-- **Column 2**: Attribute from Bob (AttributeBob)
+- **Column 1**: Attribute/Payload from Alice 
+- **Column 2**: Attribute/Payload from Bob
 
 For example:
 
