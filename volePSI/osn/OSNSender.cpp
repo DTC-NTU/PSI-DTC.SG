@@ -1,6 +1,5 @@
 #include "OSNSender.h"
 #include "libOTe/Base/BaseOT.h"
-// #include "cryptoTools/Common/BitVector.h"
 #include "cryptoTools/Crypto/AES.h"
 #include "libOTe/TwoChooseOne/Silent/SilentOtExtReceiver.h"
 #include "libOTe/TwoChooseOne/Iknp/IknpOtExtReceiver.h"
@@ -92,25 +91,24 @@ void OSNSender::setTimer(Timer &timer)
 	this->timer = &timer;
 }
 // TKL workaround for SilentOtExtReceiver deleted constructor function error
-osuCrypto::SilentOtExtReceiver &OSNSender::getSilentOtExtReceiver(osuCrypto::u64 numOTs)
+std::unique_ptr<osuCrypto::SilentOtExtReceiver> OSNSender::getSilentOtExtReceiver(osuCrypto::u64 numOTs)
 {
-	osuCrypto::SilentOtExtReceiver recv;
-	recv.configure(numOTs);
-	return recv;
+	auto recv = std::make_unique<osuCrypto::SilentOtExtReceiver>();
+	recv->configure(numOTs);
+	return recv; // ✅ Safe: transfers ownership
 }
 
 task<> OSNSender::silent_ot_recv(osuCrypto::BitVector &choices,
 								 std::vector<osuCrypto::block> &recvMsg,
 								 Socket &chl)
 {
-	// std::cout << "\n Silent OT receiver!!\n";
 
 	auto prng0 = osuCrypto::PRNG(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 
 	auto baseRecv = std::vector<osuCrypto::block>{};
 	auto numOTs = size;
 
-	co_await (getSilentOtExtReceiver(numOTs).silentReceive(choices, recvMsg, prng0, chl));
+	co_await getSilentOtExtReceiver(numOTs)->silentReceive(choices, recvMsg, prng0, chl);
 }
 
 task<> OSNSender::rand_ot_recv(osuCrypto::BitVector &choices,

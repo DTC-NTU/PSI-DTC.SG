@@ -9,11 +9,6 @@
 #include <cryptoTools/Common/BitVector.h>
 #include "benes.h"
 
-// © 2025 Digital Trust Centre - Nanyang Technological University. All rights reserved.
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 using namespace std;
 using namespace oc;
 
@@ -156,17 +151,10 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 		return;
 	}
 
-	/*
-	 * aflam dimensiunea retelei benes
-	 */
 	levels = 2 * n - 1;
 
 	vector<int> bottom2(values / 2);
 	vector<int> top2(int(ceil(values * 0.5)));
-
-	/*
-	 * destinatia este o permutare a intrari
-	 */
 
 	for (i = 0; i < values; ++i)
 		inv_perm[src[i]] = i;
@@ -177,10 +165,6 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 	for (i = 0; i < values; ++i)
 		inv_perm[perm[i]] = i;
 
-	/*
-	 * cautam sa vedem ce switch-uri vor fi activate in partea
-	 * inferioara a retelei
-	 */
 	fill(path.begin(), path.end(), -1);
 	if (values % 2 == 1)
 	{
@@ -199,12 +183,6 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 			DFS(i, 0);
 		}
 
-	/*
-	 * calculam noile perechi sursa-destinatie
-	 * 1 pentru partea superioara
-	 * 2 pentru partea inferioara
-	 */
-	// partea superioara
 	for (i = 0; i < values - 1; i += 2)
 	{
 		switched[lvl_p][perm_idx + i / 2] = path[i];
@@ -222,7 +200,6 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 		top1.push_back(src[values - 1]);
 	}
 
-	// partea inferioara
 	for (i = 0; i < values - 1; i += 2)
 	{
 		s = switched[lvl_p + levels - 1][perm_idx + i / 2] = path[perm[i]];
@@ -245,9 +222,6 @@ void Benes::gen_benes_route(int n, int lvl_p, int perm_idx, const vector<int> &s
 		top2[idx - 1] = dest[values - 1];
 	}
 
-	/*
-	 * recursivitate prin partea superioara si inferioara
-	 */
 	gen_benes_route(n - 1, lvl_p + 1, perm_idx, bottom1, bottom2);
 	gen_benes_route(n - 1, lvl_p + 1, perm_idx + values / 4, top1, top2);
 }
@@ -305,7 +279,6 @@ void Benes::gen_benes_eval(int n, int lvl_p, int perm_idx, vector<uint64_t> &src
 
 	levels = 2 * n - 1;
 
-	// partea superioara
 	for (i = 0; i < values - 1; i += 2)
 	{
 		int s = switched[lvl_p][perm_idx + i / 2];
@@ -430,7 +403,6 @@ void Benes::gen_benes_masked_evaluate(int n, int lvl_p, int perm_idx, vector<oc:
 
 	levels = 2 * n - 1;
 
-	// partea superioara
 	for (i = 0; i < values - 1; i += 2)
 	{
 		int s = switched[lvl_p][perm_idx + i / 2];

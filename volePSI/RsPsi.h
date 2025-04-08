@@ -1,5 +1,7 @@
 #pragma once
 // © 2022 Visa.
+// Modified version of original code by Visa
+// © 2025 Digital Trust Centre - Nanyang Technological University. All rights reserved.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 //
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -7,7 +9,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "volePSI/Defines.h"
-#include "volePSI/RsOprf.h"
 #include "sparsehash/dense_hash_map"
 #include "cryptoTools/Common/Timer.h"
 // *** tkl for osn
@@ -39,24 +40,6 @@ namespace volePSI
         };
     }
 
-    class RsPsiSender : public details::RsPsiBase, public oc::TimerAdapter
-    {
-    public:
-        RsOprfSender mSender;
-
-        void setMultType(oc::MultType type) { mSender.setMultType(type); };
-        Proto run(span<block> inputs, Socket &chl);
-    };
-
-    class RsPsiReceiver : public details::RsPsiBase, public oc::TimerAdapter
-    {
-    public:
-        RsOprfReceiver mRecver;
-
-        std::vector<u64> mIntersection;
-        void setMultType(oc::MultType type) { mRecver.setMultType(type); };
-    };
-
     // TKL added
     class RsPsi3rdPSenderA : public details::RsPsiBase, public oc::TimerAdapter
     {
@@ -70,8 +53,6 @@ namespace volePSI
 
     public:
         oc::AES mAEShash; // WJ: simple hash PSI.
-        RsOprfReceiver mRecver;
-        void setMultType(oc::MultType type) { mRecver.setMultType(type); };
         task<> run(span<block> inputs, Socket &chl, Socket &ch2);
         void initSpH_prng()
         {
@@ -98,9 +79,7 @@ namespace volePSI
         size_t otherSetSize = 0;
 
     public:
-        oc::AES mAEShash; // WJ: simple hash PSI.
-        RsOprfSender mSender;
-        void setMultType(oc::MultType type) { mSender.setMultType(type); };
+        oc::AES mAEShash;                                                 // WJ: simple hash PSI.
         task<> runSpHshPSI(span<block> inputs, Socket &ch1, Socket &ch2); // WJ: simple hash PSI.
 
         Proto runSpHshPsiOsn(Socket &chl, Socket &ch2, std::vector<block> &sendSet, std::vector<block> &payloadSet); // WJ : WJ: simple hash PSi with OSN
@@ -122,8 +101,6 @@ namespace volePSI
         size_t mCardinality = 0;
 
     public:
-        RsOprfReceiver mRecver;
-        void setMultType(oc::MultType type) { mRecver.setMultType(type); };
         std::vector<u64> getmIntersectionA() { return mIntersectionA; }
         std::vector<u64> getmIntersectionB() { return mIntersectionB; }
         //        void setmIntersectionB();   //WJ : for testing the getter error due to task<>

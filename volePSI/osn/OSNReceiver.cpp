@@ -36,10 +36,10 @@ task<> OSNReceiver::rand_ot_send(std::vector<std::array<osuCrypto::block, 2>> &s
 }
 
 // TKL workaround for SilentOtExtReceiver deleted constructor function error
-osuCrypto::SilentOtExtSender &OSNReceiver::getSilentOtExtSender(osuCrypto::u64 numOTs)
+std::unique_ptr<osuCrypto::SilentOtExtSender> OSNReceiver::getSilentOtExtSender(osuCrypto::u64 numOTs)
 {
-	osuCrypto::SilentOtExtSender sender;
-	sender.configure(numOTs);
+	auto sender = std::make_unique<osuCrypto::SilentOtExtSender>();
+	sender->configure(numOTs);
 	return sender;
 }
 
@@ -47,7 +47,7 @@ task<> OSNReceiver::silent_ot_send(std::vector<std::array<osuCrypto::block, 2>> 
 {
 	auto prng1 = osuCrypto::PRNG(_mm_set_epi32(4253233465, 334565, 0, 235));
 	auto numOTs = 0;
-	co_await (getSilentOtExtSender(numOTs).silentSend(sendMsg, prng1, chl));
+	co_await getSilentOtExtSender(numOTs)->silentSend(sendMsg, prng1, chl);
 }
 
 task<> OSNReceiver::gen_benes_client_osn(int values, Socket &chl, std::vector<std::vector<block>> &ret_masks)

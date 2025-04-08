@@ -26,7 +26,8 @@ class OSNSender
 	oc::Timer *timer;
 	std::vector<int> mPi;
 	Benes benes;
-	osuCrypto::SilentOtExtReceiver &getSilentOtExtReceiver(osuCrypto::u64 numOTs);
+	std::unique_ptr<osuCrypto::SilentOtExtReceiver> getSilentOtExtReceiver(osuCrypto::u64 numOTs);
+
 	task<> silent_ot_recv(osuCrypto::BitVector &choices,
 						  std::vector<osuCrypto::block> &recvMsg,
 						  Socket &chl);

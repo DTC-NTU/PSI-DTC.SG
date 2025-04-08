@@ -25,7 +25,7 @@ class OSNReceiver
 	std::atomic<int> cpus;
 
 	task<> rand_ot_send(std::vector<std::array<osuCrypto::block, 2>> &sendMsg, Socket &chl);
-	osuCrypto::SilentOtExtSender &getSilentOtExtSender(osuCrypto::u64 numOTs);
+	std::unique_ptr<osuCrypto::SilentOtExtSender> getSilentOtExtSender(osuCrypto::u64 numOTs);
 	task<> silent_ot_send(std::vector<std::array<osuCrypto::block, 2>> &sendMsg, Socket &chl);
 
 	task<> gen_benes_client_osn(int values, Socket &chl, std::vector<std::vector<block>> &ret_masks); // TKL added
