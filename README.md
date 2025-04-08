@@ -4,51 +4,61 @@
 
 This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparsehash](https://github.com/sparsehash/sparsehash), [Coproto](https://github.com/Visa-Research/coproto), [volepsi](https://github.com/Visa-Research/volepsi), [PSU](https://github.com/dujiajun/PSU/tree/master/benes)
 
-## Performance Metrics
+## ⚡ Performance Metrics
 
 - Dataset Join Time: 35.5 seconds (1 million records)
 - Performance Improvement: ~100× faster than existing methods
 
-## Installation
+## 🚀 Installation & Run
 
-PSA requires Python 3.9 and has been tested on **Linux Ubuntu 22.04.5 LTS** with **GCC (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0**. The project needs to be built before running.
+### Option 1: Docker (Recommended)
+```bash
+# Clone repository
+git clone https://github.com/DTC-NTU/PSI-DTC.SG.git
 
-### Setup
+# Build and launch container
+docker-compose build && docker-compose up
+```
+Docker automatically handles all dependencies
 
-1. **Clone the repository**
-2. **Build the project & dependencies**:
-   ```bash
-   python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
-   ```
+### Option 2: Manual Build (Linux Only)
+⚠️ **Requires Pre-installed Dependencies**
+(Same as those listed in the Dockerfile)
 
-## Quickstart
+```bash
+# 1. Clone repository
+git clone https://github.com/DTC-NTU/PSI-DTC.SG.git
 
-To run PSA with Alice (Sender), Bob (Receiver), and the Service Provider:
+# 2. Build project
+python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
 
-1. **Run the Service Provider**:
-   ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0 
-   ```
-2. **Run the Receiver (Bob)**:
-   ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/receiver.csv -r 1 -csv -hash 0
-   ```
-3. **Run the Sender (Alice)**:
-   ```bash
-   ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
-   ```
+# 3. Run services in separate terminals:
+# Service Provider (Coordinator)
+./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0
 
-These three roles (Alice, Bob, and Service Provider) work together to perform secure inner join. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
+# Receiver (Bob)
+./out/build/linux/frontend/frontend -SpHsh ./dataset/receiver.csv -r 1 -csv -hash 0
 
-## Running the PSI Services with Docker
-   ```bash
-   // Build
-   docker-compose build
-   // Start the container
-   docker-compose up
-   ```
+# Sender (Alice)
+./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
+```
 
-## Input and Output Validation
+## ⚙️ How It Works
+| Component        | Role                                          |  
+|------------------|-----------------------------------------------|
+| Service Provider | Coordinates the protocol and compiles results |
+| Alice (Sender)   | Provides one dataset                          | 
+| Bob (Receiver)   | Provides another dataset                      |
+
+
+The system:
+
+1. Exchanges secret shares between Alice and Bob
+2. Creates a virtual table with inner-joined data
+3. Preserves privacy - only matching IDs are revealed
+
+
+## 🔍 Input and Output Validation
 
 To verify the correct execution, you can inspect the input and output files:
 
@@ -99,43 +109,6 @@ For example:
 ```
 intersection8,697626930337
 ...
-```
-
-### Expected Output
-
-After running the scripts for **Alice**, **Bob**, and the **Service Provider**, the output file `out_cleartext.csv` should contain the aligned records based on common IDs. Each row should show the corresponding attributes from Alice and Bob for the same ID.
-
-### Example of Expected Output
-
-If the input CSV files for Alice and Bob are:
-
-**sender.csv**:
-
-```
-1, A1
-2, A2
-3, A3
-4, A4
-5, A5
-6, A6
-```
-
-**receiver.csv**:
-
-```
-0, B0
-2, B2
-3, B3
-6, B6
-7, B8
-```
-
-The output file `out_cleartext.csv` should look like this:
-
-```
-A2, B2
-A3, B3
-A6, B6
 ```
 
 ## DOI
