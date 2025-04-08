@@ -43,7 +43,7 @@ python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
 ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
 ```
 
-## ⚙️ How It Works
+## How It Works
 | Component        | Role                                          |  
 |------------------|-----------------------------------------------|
 | Service Provider | Coordinates the protocol and compiles results |
