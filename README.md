@@ -40,6 +40,14 @@ To run PSA with Alice (Sender), Bob (Receiver), and the Service Provider:
 
 These three roles (Alice, Bob, and Service Provider) work together to perform secure inner join. Alice and Bob exchange secret shares to create a "virtual table" with the inner join of their datasets based on common user IDs, while the Service Provider facilitates coordination and compilation.
 
+## Running the PSI Services with Docker
+   ```bash
+   // Build
+   docker-compose build
+   // Start the container
+   docker-compose up
+   ```
+
 ## Input and Output Validation
 
 To verify the correct execution, you can inspect the input and output files:
