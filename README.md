@@ -70,7 +70,7 @@ The input files from Alice and Bob are **CSV files** with the following format:
 
 For example:
 
-**Alice Input CSV** (sender.csv):
+**Alice Input CSV** (`dataset/sender.csv`):
 
 ```
 FIMbdVN0P2hWkmQp,697626930337
@@ -82,7 +82,7 @@ WkYkdx24K2t646BK,658936928362438
 ...
 ```
 
-**Bob Input CSV** (receiver.csv):
+**Bob Input CSV** (`dataset/receiver.csv`):
 
 ```
 FIMbdVN0P2hWkmQp,intersection8
@@ -96,14 +96,14 @@ rQR2DOLJxU0PvrVe,zebra
 
 ### Output Data Format
 
-The expected output file, `out_cleartext.csv`, will have the following format:
+The expected output file, `dataset/out_cleartext.csv`, will have the following format:
 
 - **Column 1**: Attribute/Payload from Alice 
 - **Column 2**: Attribute/Payload from Bob
 
 For example:
 
-**Output CSV** (out_cleartext.csv):
+**Output CSV** (`dataset/out_cleartext.csv`):
 
 ```
 intersection8,697626930337
