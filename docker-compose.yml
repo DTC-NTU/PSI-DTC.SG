@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  psi-app:
+    build: .
+    image: psi-app:latest
+    command: bash /app/start.sh  # Run the combined script
+    volumes:
+      - ./dataset:/app/dataset
+      - ./start.sh:/app/start.sh  # Mount the script into the container
+    working_dir: /app
+    ports:
+      - "1212:1212"
+      - "1213:1213"
+      - "1214:1214"
+    networks:
+      - psi-network
+
+networks:
+  psi-network:
+    driver: bridge
