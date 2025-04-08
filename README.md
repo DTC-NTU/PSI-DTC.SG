@@ -52,7 +52,6 @@ python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
 
 
 The system:
-
 1. Exchanges secret shares between Alice and Bob
 2. Creates a virtual table with inner-joined data
 3. Preserves privacy - only matching IDs are revealed
