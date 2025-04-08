@@ -4,12 +4,12 @@
 
 This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparsehash](https://github.com/sparsehash/sparsehash), [Coproto](https://github.com/Visa-Research/coproto), [volepsi](https://github.com/Visa-Research/volepsi), [PSU](https://github.com/dujiajun/PSU/tree/master/benes)
 
-## ⚡ Performance Metrics
+## Performance Metrics
 
 - Dataset Join Time: 35.5 seconds (1 million records)
 - Performance Improvement: ~100× faster than existing methods
 
-## 🚀 Installation & Run
+## Installation & Run
 
 ### Option 1: Docker (Recommended)
 ```bash
@@ -57,7 +57,7 @@ The system:
 3. Preserves privacy - only matching IDs are revealed
 
 
-## 🔍 Input and Output Validation
+## Input and Output Validation
 
 To verify the correct execution, you can inspect the input and output files:
 
