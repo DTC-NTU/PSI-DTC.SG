@@ -12,28 +12,18 @@ This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparseh
 
 
 ## How It Works
-Private Set Alignment (PSA) enables secure analytics on combined datasets without exposing raw data. The protocol involves three parties:
-```mermaid
-graph LR
-    A[Alice] -->|Sends Private Data| SP[Service Provider]
-    B[Bob] -->|Sends Private Data| SP
-    SP -->|Performs| PSA[[Private Set Alignment]]
-    PSA -->|Returns| R[Secret-Shared Linked Records]
-    
-    style PSA fill:#e6f3ff,stroke:#0066cc
-    style R fill:#f0f8e6,stroke:#228b22
-```
-### Key Steps for Privacy-Preserving Data Processing
+Private Set Alignment (PSA) enables secure analytics on combined datasets without exposing raw data. The protocol involves three parties: Alice, Bob and the Service Provider that it's going to perform the private set alignment.
 
-#### 1. Data Submission
-- **Participants**: Alice and Bob
-- **Action**: Alice and Bob securely encrypt their data before submitting it to the Service Provider. This ensures that sensitive information is protected during transmission.
+Key Steps for Privacy-Preserving Data Processing:
+1. Data Submission
+    - Participants: Alice and Bob
+    - Action: Alice and Bob securely submit their data to the Service Provider. This ensures that sensitive information is protected during transmission.
 
-#### 2. Private Set Alignment
-- **Action**: The Service Provider uses a privacy-preserving technique to align and identify matching records between Alice and Bob’s encrypted datasets without revealing any individual IDs or private information.
+2. Private Set Alignment
+    - Action: The Service Provider uses a privacy-preserving technique to align and identify matching records between Alice and Bob’s datasets without revealing any individual IDs or private information.
 
-#### 3. Result Generation
-- **Action**: After matching the records, the Service Provider generates the linked records through secret-sharing protocols. These records are then provided to Alice and Bob for secure analysis using Multi-Party Computation (MPC) techniques.
+3. Result Generation
+    - Action: After matching the records, the Service Provider generates the linked records through secret-sharing protocols.
 
 For technical details, see our paper (linked below).
 
