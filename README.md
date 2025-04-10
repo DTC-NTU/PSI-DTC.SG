@@ -9,7 +9,28 @@ This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparseh
 - Dataset Join Time: 35.5 seconds (1 million records)
 - Performance Improvement: ~100× faster than existing methods
 
+
+
+## How It Works
+Private Set Alignment (PSA) enables secure analytics on combined datasets without exposing raw data. The protocol involves three parties: Alice, Bob and the Service Provider that it's going to perform the private set alignment.
+
+Key Steps for Privacy-Preserving Data Processing:
+1. Data Submission
+    - Participants: Alice and Bob
+    - Action: Alice and Bob securely submit their data to the Service Provider. This ensures that sensitive information is protected during transmission.
+
+2. Private Set Alignment
+    - Action: The Service Provider uses a privacy-preserving technique to align and identify matching records between Alice and Bob’s datasets without revealing any individual IDs or private information.
+
+3. Result Generation
+    - Action: After matching the records, the Service Provider generates the linked records through secret-sharing protocols.
+
+For technical details, see our paper (linked below).
+
+
+
 ## Installation & Run
+⚠️ Note: Building the application may take more than 20 minutes to complete depending on your system.
 
 ### Option 1: Docker (Recommended)
 ```bash
@@ -22,8 +43,22 @@ docker-compose build && docker-compose up
 Docker automatically handles all dependencies
 
 ### Option 2: Manual Build (Linux Only)
-⚠️ **Requires Pre-installed Dependencies**
-(Same as those listed in the Dockerfile)
+⚠️ Requires Pre-installed Dependencies, the commands can be found inside the `dockerfile`.
+
+| Dependency         | Purpose                                                                  |
+|--------------------|--------------------------------------------------------------------------|
+| build-essential    | Compiler and basic development tools (version 12.9ubuntu3)               |
+| gdb                | Debugger (version 12.1)                                                  |
+| libssl-dev         | SSL library for encryption support (version 3.0.2-0ubuntu1.19)           |
+| gcc-11             | GNU C compiler (version 11)                                              |
+| g++-11             | GNU C++ compiler (version 11)                                            |
+| wget               | File download utility                                                    |
+| curl               | Data transfer tool                                                       |
+| libboost-all-dev   | Boost C++ libraries                                                      |
+| libtool            | Library management tools (version 2.4.6-15build2)                        |
+| git                | Version control system                                                   |
+| cmake (v4.0.0)     | Build system generator (version 4.0.0)                                   |
+
 
 ```bash
 # 1. Clone repository
@@ -33,7 +68,7 @@ git clone https://github.com/DTC-NTU/PSI-DTC.SG.git
 python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
 
 # 3. Run services in separate terminals:
-# Service Provider (Coordinator)
+# Service Provider (Service Provider)
 ./out/build/linux/frontend/frontend -SpHsh ./dataset/cleartext.csv -r 2 -csv -hash 0
 
 # Receiver (Bob)
@@ -43,18 +78,28 @@ python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
 ./out/build/linux/frontend/frontend -SpHsh ./dataset/sender.csv -r 0 -csv -hash 0
 ```
 
-## How It Works
-| Component        | Role                                          |  
-|------------------|-----------------------------------------------|
-| Service Provider | Coordinates the protocol and compiles results |
-| Alice (Sender)   | Provides one dataset                          | 
-| Bob (Receiver)   | Provides another dataset                      |
+### Expected Terminal Output
+After the application is built and executed, you should see the following output in your terminal to confirm a correct execution:
+```bash
+Attaching to psi-app-1
+psi-app-1  | 
+psi-app-1  | Alice:
+psi-app-1  | ./dataset/receiver.csv
+psi-app-1  | 
+psi-app-1  | Bob: 
+psi-app-1  | ./dataset/sender.csv
+psi-app-1  | reading input file takes 1 ms
+psi-app-1  | reading input file takes 2 ms
+psi-app-1  | Establishing connection takes 1 ms,
+psi-app-1  | start to run secure inner join... Alice sends to Bob: 48 Bytes.
+psi-app-1  | Establishing connection takes 1 ms,
+psi-app-1  | start to run secure inner join... 
+psi-app-1  | 
+psi-app-1  | 
+psi-app-1  | Overall time overhead is 25 ms,
+psi-app-1  | Overall communication overhead is 110928 Bytes, 
+```
 
-
-The system:
-1. Exchanges secret shares between Alice and Bob
-2. Creates a virtual table with inner-joined data
-3. Preserves privacy - only matching IDs are revealed
 
 
 ## Input and Output Validation

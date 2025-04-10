@@ -1,2 +1,3 @@
-out
+out/**/* 
 dataset/out_*.csv
+.vscode/**/* 
