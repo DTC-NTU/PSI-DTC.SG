@@ -1,8 +1,13 @@
 # PSA: Private Set Alignment for Secure and Collaborative Analytics on Large-Scale Data (Demo)
 
+[![DOI](https://img.shields.io/badge/DOI-10.48550%2FarXiv.2410.04746-blue)](https://arxiv.org/abs/2410.04746)
+
+
 **PSA** is a privacy-preserving technique enabling secure, collaborative analytics between two parties with vertically partitioned datasets, without directly sharing sensitive data. This demo integrates **Private Set Intersection (PSI)** and an **Oblivious Switching Network** to achieve efficient and secure **Private Set Alignment (PSA)**.
 
 This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparsehash](https://github.com/sparsehash/sparsehash), [Coproto](https://github.com/Visa-Research/coproto), [volepsi](https://github.com/Visa-Research/volepsi), [PSU](https://github.com/dujiajun/PSU/tree/master/benes)
+
+
 
 ## Performance Metrics
 
@@ -10,24 +15,19 @@ This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparseh
 - Performance Improvement: ~100× faster than existing methods
 
 
-
 ## How It Works
-The protocol involves three parties: Alice, Bob and the Service Provider that it's going to perform the private set alignment.
+| Component        | Role                                          |  
+|------------------|-----------------------------------------------|
+| Service Provider | Coordinates the protocol and compiles results |
+| Alice (Sender)   | Provides one dataset                          | 
+| Bob (Receiver)   | Provides another dataset                      |
 
-Key Steps for Privacy-Preserving Data Processing:
-1. Data Submission
-    - Participants: Alice and Bob
-    - Action: Alice and Bob securely submit their data to the Service Provider. This ensures that sensitive information is protected during transmission.
+The system:
+1. Exchanges secret shares between Alice and Bob
+2. Creates a virtual table with inner-joined data
+3. Preserves privacy - only matching IDs are revealed
 
-2. Private Set Alignment
-    - Action: The Service Provider uses a privacy-preserving technique to align and identify matching records between Alice and Bob’s datasets without revealing any individual IDs or private information.
-
-3. Result Generation
-    - Action: After matching the records, the Service Provider generates the linked records through secret-sharing protocols.
-
-For technical details, see our paper (linked below).
-
-
+For complete technical details, see our [paper](https://arxiv.org/abs/2410.04746).
 
 ## Installation & Run
 ⚠️ Note: Building the application may take more than 20 minutes to complete depending on your system.
@@ -79,27 +79,7 @@ python3 build.py -DVOLE_PSI_ENABLE_BOOST=ON
 ```
 
 ### Expected Terminal Output
-After the application is built and executed, you should see the following output in your terminal to confirm a correct execution:
-```bash
-Attaching to psi-app-1
-psi-app-1  | 
-psi-app-1  | Alice:
-psi-app-1  | ./dataset/receiver.csv
-psi-app-1  | 
-psi-app-1  | Bob: 
-psi-app-1  | ./dataset/sender.csv
-psi-app-1  | reading input file takes 1 ms
-psi-app-1  | reading input file takes 2 ms
-psi-app-1  | Establishing connection takes 1 ms,
-psi-app-1  | start to run secure inner join... Alice sends to Bob: 48 Bytes.
-psi-app-1  | Establishing connection takes 1 ms,
-psi-app-1  | start to run secure inner join... 
-psi-app-1  | 
-psi-app-1  | 
-psi-app-1  | Overall time overhead is 25 ms,
-psi-app-1  | Overall communication overhead is 110928 Bytes, 
-```
-
+After the application is built and executed, you should see 3 new files starting with `out_` within the `dataset` folder.
 
 
 ## Input and Output Validation
@@ -155,16 +135,12 @@ intersection8,697626930337
 ...
 ```
 
-## DOI
+## Research and Citation
 
 For more details, access the full paper via DOI:  
 [10.48550/arXiv.2410.04746](https://arxiv.org/abs/2410.04746)
 
-## Licensing
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Citation
+If you use this code in your research, please cite:
 
 ```
 @article{article,
@@ -174,6 +150,10 @@ title = {PSA: Private Set Alignment for Secure and Collaborative Analytics on La
 doi = {10.48550/arXiv.2410.04746}
 }
 ```
+
+## Licensing
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ## Authors
 
