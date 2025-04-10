@@ -12,7 +12,7 @@ This project depends on [libOTe](https://github.com/osu-crypto/libOTe), [sparseh
 
 
 ## How It Works
-Private Set Alignment (PSA) enables secure analytics on combined datasets without exposing raw data. The protocol involves three parties: Alice, Bob and the Service Provider that it's going to perform the private set alignment.
+The protocol involves three parties: Alice, Bob and the Service Provider that it's going to perform the private set alignment.
 
 Key Steps for Privacy-Preserving Data Processing:
 1. Data Submission
