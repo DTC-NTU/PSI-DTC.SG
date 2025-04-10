@@ -45,20 +45,6 @@ Docker automatically handles all dependencies
 ### Option 2: Manual Build (Linux Only)
 ⚠️ Requires Pre-installed Dependencies, the commands can be found inside the `dockerfile`.
 
-| Dependency         | Purpose                                                                  |
-|--------------------|--------------------------------------------------------------------------|
-| build-essential    | Compiler and basic development tools (version 12.9ubuntu3)               |
-| gdb                | Debugger (version 12.1)                                                  |
-| libssl-dev         | SSL library for encryption support (version 3.0.2-0ubuntu1.19)           |
-| gcc-11             | GNU C compiler (version 11)                                              |
-| g++-11             | GNU C++ compiler (version 11)                                            |
-| wget               | File download utility                                                    |
-| curl               | Data transfer tool                                                       |
-| libboost-all-dev   | Boost C++ libraries                                                      |
-| libtool            | Library management tools (version 2.4.6-15build2)                        |
-| git                | Version control system                                                   |
-| cmake (v4.0.0)     | Build system generator (version 4.0.0)                                   |
-
 
 ```bash
 # 1. Clone repository
